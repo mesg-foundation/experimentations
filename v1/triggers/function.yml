@@ -1,0 +1,12 @@
+name: function
+connector:
+  type: http
+filters:
+  from:
+    - include: 172.22.0.1
+  payload.foo: 
+    - eq: 'bar'
+service:
+  type: function
+  data:
+    code: "module.exports = payload => payload"

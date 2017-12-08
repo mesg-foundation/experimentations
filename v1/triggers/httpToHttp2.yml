@@ -1,0 +1,10 @@
+name: http2http2
+connector:
+  type: http
+filters:
+service:
+  type: webhook
+  data:
+    endpoint: http://webhook.site/f12d5419-626f-4237-9128-da31dcba0edb
+    headers:
+      Authorization: super-big-secret

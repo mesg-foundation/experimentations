@@ -1,0 +1,22 @@
+{
+  "name": "dispatcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha **/*.test.js",
+    "start": "node src/index.js"
+  },
+  "author": "Anthony Estebe <contact@anthonyestebe.com> (http://microblog.anthonyestebe.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "influx": "^5.0.7",
+    "js-yaml": "^3.10.0"
+  },
+  "devDependencies": {
+    "mocha": "^4.0.1"
+  }
+}

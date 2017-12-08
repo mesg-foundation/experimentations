@@ -1,0 +1,17 @@
+type: http
+outputs:
+  id:
+    type: String
+  from: 
+    type: String
+  executedAt:
+    type: Datetime
+  payload:
+    type: JSON
+run:
+  version: '2'
+  services:
+    app:
+      image: connector/http
+      ports:
+        - 8080:8080

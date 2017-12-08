@@ -1,0 +1,1 @@
+module.exports = nodes => nodes[Math.floor(Math.random() * nodes.length)]

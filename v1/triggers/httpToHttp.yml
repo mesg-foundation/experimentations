@@ -1,0 +1,14 @@
+name: http2http
+connector:
+  type: http
+filters:
+  from:
+    - include: 172.22.0.1
+  payload.foo: 
+    - eq: 'bar'
+service:
+  type: webhook
+  data:
+    endpoint: http://webhook.site/427c12e2-8fc3-436e-824c-89c7feedca21
+    headers:
+      Authorization: super-secret
