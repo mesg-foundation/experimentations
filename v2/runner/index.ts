@@ -4,24 +4,28 @@ import { readFileSync } from "fs";
 
 const readYAML = file => YAML.safeLoad(readFileSync(file, 'utf8'))
 
+const servicesFor = serviceName => {
+  const config = readYAML(`./services/${serviceName}/config.yml`)
+  return Object.keys(config.services)
+    .reduce((acc, service) => ({
+      ...acc,
+      [`${config.name}_${service}`]: {
+        ...config.services[service],
+        ...config.services[service].depends_on
+          ? { depends_on: (config.services[service].depends_on || []).map(x => `${config.name}_${x}`) }
+          : null
+      }
+    }), {})
+}
+
 const start = async services => {
-  const globalDockerCompose = readYAML('./docker-compose.yml')
-  const config = { ...globalDockerCompose }
-  services.map(serviceName => {
-    const serviceConfig = readYAML(`./services/${serviceName}/config.yml`)
-    Object.keys(serviceConfig.services)
-      .forEach(service => {
-        config.services[[serviceConfig.name, service].join('_')] = {
-          ...serviceConfig.services[service],
-          depends_on: [
-            ...(serviceConfig.services[service].depends_on || [])
-              .map(x => [serviceConfig.name, x].join('_')),
-            'app',
-          ]
-        }
-      })
+  return deploy({
+    version: "3",
+    services: services.reduce((acc, serviceName) => ({
+      ...acc,
+      ...servicesFor(serviceName)
+    }), {})
   })
-  return deploy(config)
 }
 
 const stop = async serviceName => {

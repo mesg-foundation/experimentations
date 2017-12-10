@@ -9,7 +9,7 @@ const writeFile = config => {
 }
 
 const run = (command, ...args) => new Promise((resolve, reject) => {
-  console.log(`${command} ${args.join(' ')}`)
+  const cmd = `${command} ${args.join(' ')}`
   const logs = []
   const errors = []
   const child = childProcess.spawn(command, args)
@@ -17,11 +17,8 @@ const run = (command, ...args) => new Promise((resolve, reject) => {
   child.stderr.on('data', x => logs.push(x.toString()))
   child.on('error', x => errors.push(x.toString()))
   child.on('close', code => code === 0
-    ? resolve({
-      logs,
-      errors
-    })
-    : reject(code))
+    ? resolve({ cmd, logs, errors })
+    : reject({ cmd, logs, errors }))
 })
 
 const deploy = async config => {

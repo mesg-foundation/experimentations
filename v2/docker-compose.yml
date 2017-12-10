@@ -1,8 +1,0 @@
-version: "3"
-services:
-  app:
-    image: runner_app
-    volumes:
-      - ./:/usr/src/app
-    ports:
-      - 60002:60002

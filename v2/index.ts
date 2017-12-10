@@ -11,13 +11,21 @@ const toArray = val => Array.isArray(val)
   : val.split(',')
 
 app.post('/start', async (req, res) => {
-  const result = await Runner.start(toArray(req.body.service))
-  res.json(result)
+  try {
+    const result = await Runner.start(toArray(req.body.service))
+    res.json(result)
+  } catch (e) {
+    res.json(e).status(500)
+  }
 })
 
 app.post('/stop', async (req, res) => {
-  const result = await Runner.stop(toArray(req.body.service))
-  res.json(result)
+  try {
+    const result = await Runner.stop(toArray(req.body.service))
+    res.json(result)
+  } catch (e) {
+    res.json(e).status(500)
+  }
 })
 
 app.listen(process.env.PORT || 60001)
