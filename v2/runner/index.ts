@@ -1,4 +1,4 @@
-import { deploy } from "../docker";
+import { deploy, build } from "../docker";
 import * as YAML from "js-yaml";
 import { readFileSync } from "fs";
 
@@ -13,6 +13,9 @@ const servicesFor = serviceName => {
         ...config.services[service],
         ...config.services[service].depends_on
           ? { depends_on: (config.services[service].depends_on || []).map(x => `${config.name}_${x}`) }
+          : null,
+        ...config.services[service].links
+          ? { links: (config.services[service].links || []).map(x => `${config.name}_${x}:${config.name}_${x}`) }
           : null
       }
     }), {})
@@ -31,8 +34,7 @@ const start = async services => {
 const stop = async serviceName => {
   const currentDockerCompose = readYAML('./.docker-compose.tmp.yml')
   const config = readYAML(`./services/${serviceName}/config.yml`)
-
-  const newConfig = Object.keys(config.services)
+  Object.keys(config.services)
     .forEach(service => {
       delete currentDockerCompose.services[[config.name, service].join('_')]
     })
@@ -41,5 +43,7 @@ const stop = async serviceName => {
 
 export default {
   start,
-  stop
+  stop,
+  build: async services => Promise.all(services
+    .map(service => build(`./services/${service}`, service)))
 }

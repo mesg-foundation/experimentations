@@ -16,17 +16,24 @@ const run = (command, ...args) => new Promise((resolve, reject) => {
   child.stdout.on('data', x => logs.push(x.toString()))
   child.stderr.on('data', x => logs.push(x.toString()))
   child.on('error', x => errors.push(x.toString()))
-  child.on('close', code => code === 0
-    ? resolve({ cmd, logs, errors })
-    : reject({ cmd, logs, errors }))
+  child.on('close', code => {
+    return code === 0
+      ? resolve({ cmd, logs, errors })
+      : reject({ cmd, logs, errors })
+  })
 })
+
+const build = async (path, name) => {
+  return run('docker', 'build', '-t', `mesg/${name}`, path)
+}
 
 const deploy = async config => {
   const file = writeFile(config)
   return run('docker', 'stack', 'deploy', '--compose-file', `${process.cwd()}/${file}`, '--prune', 'MESG')
-  // return run('docker-compose', '--project-name', 'MESG', '--file', process.cwd() + '/' + file, 'up', '-d')
+  // return run('docker-compose', '--project-name', 'MESG', '--file', process.cwd() + '/' + file, 'up', '-d', '--remove-orphans')
 }
 
 export {
-  deploy
+  deploy,
+  build
 }

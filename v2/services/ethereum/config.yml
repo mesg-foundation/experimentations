@@ -1,12 +1,12 @@
 name: ethereum
 services:
   app:
-    image: nginx
-    depends_on:
-      - node
-  node:
-    image: ethereum/client-go
-    ports:
-      - 8586:8586
-      - 30303:30303
-    command: 'ethereum/client-go --ws --wsaddr "0.0.0.0" --wsorigins "*" --syncmode "light"'
+    image: mesg/ethereum
+    # links:
+    #   - node
+  # node:
+  #   image: ethereum/client-go
+  #   ports:
+  #     - 8546:8546
+  #     - 30303:30303
+  #   command: 'ethereum/client-go --ws --wsaddr "0.0.0.0" --wsorigins "*" --syncmode "light"'
