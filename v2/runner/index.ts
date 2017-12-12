@@ -13,7 +13,6 @@ const servicesFor = serviceName => {
         ...acc,
         [`${config.name}_${service}`]: {
           ...containerConf,
-          ...config.service,
           ...containerConf.volumes
             ? { volumes: (containerConf.volumes || []).map(x => `~/.mesg/${config.name}/${service}:${x.split(':').reverse()[0]}`) }
             : null
