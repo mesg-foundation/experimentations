@@ -7,18 +7,19 @@ const readYAML = file => YAML.safeLoad(readFileSync(file, 'utf8'))
 const servicesFor = serviceName => {
   const config = readYAML(`./services/${serviceName}/config.yml`)
   return Object.keys(config.services)
-    .reduce((acc, service) => ({
-      ...acc,
-      [`${config.name}_${service}`]: {
-        ...config.services[service],
-        ...config.services[service].depends_on
-          ? { depends_on: (config.services[service].depends_on || []).map(x => `${config.name}_${x}`) }
-          : null,
-        ...config.services[service].links
-          ? { links: (config.services[service].links || []).map(x => `${config.name}_${x}:${config.name}_${x}`) }
-          : null
+    .reduce((acc, service) => {
+      const containerConf = config.services[service]
+      return {
+        ...acc,
+        [`${config.name}_${service}`]: {
+          ...containerConf,
+          ...config.service,
+          ...containerConf.volumes
+            ? { volumes: (containerConf.volumes || []).map(x => `~/.mesg/${config.name}/${service}:${x.split(':').reverse()[0]}`) }
+            : null
+        }
       }
-    }), {})
+    }, {})
 }
 
 const start = async services => {
