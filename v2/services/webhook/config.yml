@@ -1,0 +1,7 @@
+name: webhook
+services:
+  app:
+    image: mesg/webhook
+    ports:
+      - 8080:8080
+  

@@ -30,19 +30,8 @@ const start = async services => {
   )
 }
 
-const stop = async serviceName => {
-  const services = readYAML('./.docker-compose.tmp.yml').services
-  const config = readYAML(`./services/${serviceName}/config.yml`)
-  Object.keys(config.services)
-    .forEach(service => {
-      delete services[[config.name, service].join('_')]
-    })
-  return deploy(services)
-}
-
 export default {
   start,
-  stop,
   build: async services => Promise.all(services
     .map(service => build(`./services/${service}`, service)))
 }

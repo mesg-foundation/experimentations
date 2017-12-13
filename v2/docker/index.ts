@@ -3,11 +3,7 @@ import * as YAML from "js-yaml";
 import { writeFileSync } from "fs";
 import dockerCli from "./api";
 
-const writeFile = config => {
-  const path = ".docker-compose.tmp.yml"
-  writeFileSync(path, YAML.safeDump(config))
-  return path
-}
+const stack = 'MESG'
 
 const run = (command, ...args) => new Promise((resolve, reject) => {
   const cmd = `${command} ${args.join(' ')}`
@@ -28,41 +24,27 @@ const build = async (path, name) => {
   return run('docker', 'build', '-t', `mesg/${name}`, path)
 }
 
-const sdeploy = async services => {
-  console.log(services)
-  const file = writeFile({ version: '3', services })
-  return run('docker', 'stack', 'deploy', '--compose-file', `${process.cwd()}/${file}`, '--prune', 'MESG')
-  // return run('docker-compose', '--project-name', 'MESG', '--file', process.cwd() + '/' + file, 'up', '-d', '--remove-orphans')
+const startService = networks =>  async (name, config) => {
+  return dockerCli.services.create(stack, name, {
+    ...config,
+    networkId: networks.map(x => x.Id)[0]
+  })
 }
 
 const deploy = async services => {
-  const stack = 'MESG'
   const networks = await dockerCli.networks.all(stack)
+  const startServiceWithNetwork = startService(networks)
   const existingServices = await dockerCli.services.all(stack)
-  const startedServices = await Promise.all(Object.keys(services)
-    .filter(serviceName => !existingServices.find(x => x.Spec.Name === [stack, serviceName].join('_')))
-    .map(async serviceName => dockerCli.services.create(stack, serviceName, {
-      ...services[serviceName],
-      networkId: networks.map(x => x.Id)[0]
-    })))
+  const servicesToStart = Object.keys(services)
+    .filter(x => !existingServices.find(y => y.Spec.Name === [stack, x].join('_')))
+  const servicesToStop = existingServices
+    .filter(x => !services[x.Spec.Name.replace(`${stack}_`, '')])
   return {
-    networks,
-    services: await dockerCli.services.all(stack),
-    startedServices
+    stoppedServices: await Promise.all(servicesToStop
+      .map(x => dockerCli.services.stop(x.ID))),
+    startedServices: await Promise.all(servicesToStart
+      .map(x => startServiceWithNetwork(x, services[x])))
   }
-  
-  
-  
-  // if (!dockerCli.client.info().Swarm.ControlAvailable  ) { RUN(docker swarm init) }
-
-  // // remove all stopped services
-  // dockerCli.services.all('MESG')
-  //   .filter(x => services.indexOf(x.name) < 0)
-  //   .each(x => dockerCli.services.stop(x))
-
-  
-  // dockerCli.networks.find('MESG') || dockerCli.networks.create('MESG')
-
 }
 
 export {

@@ -19,6 +19,8 @@ const allServices = async stack => docker
     label: [`com.docker.stack.namespace=${stack}`]
   } })
 
+const stopService = async id => docker.getService(id).remove()
+
 const createService = async (stack, name, config) => docker
   .createService({
     Name: [stack, name].join('_'),
@@ -83,6 +85,7 @@ export default {
   },
   services: {
     all: allServices,
-    create: createService
+    create: createService,
+    stop: stopService
   }
 }

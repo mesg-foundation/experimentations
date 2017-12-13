@@ -10,7 +10,7 @@ const toArray = val => Array.isArray(val)
   ? val
   : val.split(',')
 
-;['start', 'stop', 'build']
+;['start', 'build']
   .map(action => app.post(`/${action}`, async (req, res) => {
     try {
       const result = await Runner[action](toArray(req.body.service))
