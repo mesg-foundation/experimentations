@@ -39,8 +39,8 @@ const deploy = async services => {
   const stack = 'MESG'
   const networks = await dockerCli.networks.all(stack)
   const existingServices = await dockerCli.services.all(stack)
-  
   const startedServices = await Promise.all(Object.keys(services)
+    .filter(serviceName => !existingServices.find(x => x.Spec.Name === [stack, serviceName].join('_')))
     .map(async serviceName => dockerCli.services.create(stack, serviceName, {
       ...services[serviceName],
       networkId: networks.map(x => x.Id)[0]
@@ -48,6 +48,7 @@ const deploy = async services => {
   return {
     networks,
     services: await dockerCli.services.all(stack),
+    startedServices
   }
   
   
