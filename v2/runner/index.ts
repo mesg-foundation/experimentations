@@ -22,23 +22,22 @@ const servicesFor = serviceName => {
 }
 
 const start = async services => {
-  return deploy({
-    version: "3",
-    services: services.reduce((acc, serviceName) => ({
+  return deploy(services
+    .reduce((acc, serviceName) => ({
       ...acc,
       ...servicesFor(serviceName)
     }), {})
-  })
+  )
 }
 
 const stop = async serviceName => {
-  const currentDockerCompose = readYAML('./.docker-compose.tmp.yml')
+  const services = readYAML('./.docker-compose.tmp.yml').services
   const config = readYAML(`./services/${serviceName}/config.yml`)
   Object.keys(config.services)
     .forEach(service => {
-      delete currentDockerCompose.services[[config.name, service].join('_')]
+      delete services[[config.name, service].join('_')]
     })
-  return deploy(currentDockerCompose)
+  return deploy(services)
 }
 
 export default {
