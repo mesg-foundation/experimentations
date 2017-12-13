@@ -38,7 +38,7 @@ const deploy = async services => {
   const servicesToStart = Object.keys(services)
     .filter(x => !existingServices.find(y => y.Spec.Name === [stack, x].join('_')))
   const servicesToStop = existingServices
-    .filter(x => !services[x.Spec.Name.replace(`${stack}_`, '')])
+    .filter(x => !services[x.Spec.Name.replace(`${stack}_`, '')] && x.Spec.Labels['com.docker.stack.image'] !== 'mesg/runner')
   return {
     stoppedServices: await Promise.all(servicesToStop
       .map(x => dockerCli.services.stop(x.ID))),
