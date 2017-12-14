@@ -1,27 +1,11 @@
-import * as childProcess from 'child_process'
 import * as YAML from "js-yaml";
 import { writeFileSync } from "fs";
 import dockerCli from "./api";
 
 const stack = 'MESG'
 
-const run = (command, ...args) => new Promise((resolve, reject) => {
-  const cmd = `${command} ${args.join(' ')}`
-  const logs = []
-  const errors = []
-  const child = childProcess.spawn(command, args)
-  child.stdout.on('data', x => logs.push(x.toString()))
-  child.stderr.on('data', x => logs.push(x.toString()))
-  child.on('error', x => errors.push(x.toString()))
-  child.on('close', code => {
-    return code === 0
-      ? resolve({ cmd, logs, errors })
-      : reject({ cmd, logs, errors })
-  })
-})
-
 const build = async (path, name) => {
-  return run('docker', 'build', '-t', `mesg/${name}`, path)
+  return dockerCli.images.build(path, `mesg/${name}`)
 }
 
 const startService = networks =>  async (name, config) => {

@@ -1,4 +1,5 @@
 import * as Docker from 'dockerode'
+import { pack } from 'tar-fs'
 
 const docker = new Docker({
   socketPath: '/var/run/docker.sock'
@@ -75,6 +76,9 @@ const createService = async (stack, name, config) => docker
     }
   })
 
+const buildImage = async (path, name) => {
+  return docker.buildImage(pack(process.cwd() + path.replace(/\./, '')), { t: name })
+}
 
 export default {
   swarm: {
@@ -87,5 +91,8 @@ export default {
     all: allServices,
     create: createService,
     stop: stopService
+  },
+  images: {
+    build: buildImage
   }
 }
