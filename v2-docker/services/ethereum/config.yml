@@ -9,4 +9,4 @@ services:
     ports:
       - 8546:8546
       - 30303:30303
-    command:  --jsonrpc-interface 0.0.0.0 --jsonrpc-hosts=all --unsafe-expose
+    command: --light --no-ui --jsonrpc-interface 0.0.0.0 --jsonrpc-hosts=all --can-restart --no-secretstore --pruning fast --pruning-history 8 --db-compaction ssd --fat-db off --unsafe-expose
