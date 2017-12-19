@@ -1,4 +1,21 @@
 name: webhook
+events:
+  request:
+    data:
+      ip: String
+      body: JSON
+  webhookSent:
+    data:
+      body: JSON
+      code: String
+commands:
+  webhook:
+    args:
+      url: String
+      headers: JSON
+      data: JSON
+    events:
+      - webhookSent
 services:
   app:
     image: mesg/webhook

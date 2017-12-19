@@ -1,15 +1,32 @@
+const serviceFactory = require('lib')
 const express = require('express')
 const bodyParser = require('body-parser')
+const nodeFetch = require('node-fetch')
 
-const app = express()
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+const webhook = async ({ url, headers, data }, { webhookSent, request }) => {
+  console.log('passe', url, headers, data)
+  const response = await nodeFetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    body: JSON.stringify(data)
+  })
+  const result = await response.text()
+  webhookSent({
+    body: result,
+    code: response.status
+  })
+}
 
-app.post('/', (req, res) => {
-  console.log('new request')
-  console.log(JSON.stringify(req.body, null, 2))
-  res.json({})
-})
-
-app.listen(8080, '0.0.0.0')
-console.log('server started on port 8080 :)')
+serviceFactory({
+  webhook
+}, ({ request }) => express()
+  .use(bodyParser.json())
+  .use(bodyParser.urlencoded({ extended: true }))
+  .post('/', (req, res) => res.json(request({
+    ip: req.ip,
+    body: req.body
+  })))
+  .listen(8080, '0.0.0.0'))
