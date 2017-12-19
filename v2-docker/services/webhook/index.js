@@ -1,4 +1,4 @@
-const serviceFactory = require('lib')
+const mesg = require('mesg')
 const express = require('express')
 const bodyParser = require('body-parser')
 const nodeFetch = require('node-fetch')
@@ -20,7 +20,7 @@ const webhook = async ({ url, headers, data }, { webhookSent, request }) => {
   })
 }
 
-serviceFactory({
+mesg({
   webhook
 }, ({ request }) => express()
   .use(bodyParser.json())
