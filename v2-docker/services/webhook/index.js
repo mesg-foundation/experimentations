@@ -1,4 +1,4 @@
-const mesg = require('mesg')
+const mesg = require('experimentation-mesg-js')
 const express = require('express')
 const bodyParser = require('body-parser')
 const nodeFetch = require('node-fetch')
