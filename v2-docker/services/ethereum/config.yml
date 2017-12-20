@@ -1,12 +1,24 @@
 name: ethereum
+events:
+  onTransaction:  
+    data:
+      hash: String
+      from: String
+      to: String
+      value: Number
+commands:
+  transfert:
+    args:
+      to: String
+      value: Number
 services:
   app:
     image: mesg/ethereum
-  node:
-    image: parity/parity:stable
-    volumes:
-      - "~/.mesg/ethereum/node:/root/.local/share/io.parity.ethereum"
-    ports:
-      - 8546:8546
-      - 30303:30303
-    command: --light --no-ui --jsonrpc-interface 0.0.0.0 --jsonrpc-hosts=all --can-restart --no-secretstore --pruning fast --pruning-history 8 --db-compaction ssd --fat-db off --unsafe-expose
+  # node:
+  #   image: parity/parity:stable
+  #   volumes:
+  #     - "~/.mesg/ethereum/node:/root/.local/share/io.parity.ethereum"
+  #   ports:
+  #     - 8546:8546
+  #     - 30303:30303
+  #   command: --light --no-ui --jsonrpc-interface 0.0.0.0 --jsonrpc-hosts=all --can-restart --no-secretstore --pruning fast --pruning-history 8 --db-compaction ssd --fat-db off --unsafe-expose
