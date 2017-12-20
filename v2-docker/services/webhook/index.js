@@ -3,7 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const nodeFetch = require('node-fetch')
 
-const webhook = async ({ url, headers, data }, { webhookSent, request }) => {
+const webhook = async ({ url, headers, data }, { webhookSent }) => {
   console.log('passe', url, headers, data)
   const response = await nodeFetch(url, {
     method: 'POST',
