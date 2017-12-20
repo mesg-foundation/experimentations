@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^8.0.57",
+    "amqplib": "^0.5.2",
     "body-parser": "^1.18.2",
     "dockerode": "^2.5.3",
     "express": "^4.16.2",
