@@ -1,0 +1,82 @@
+################
+# Executors Types
+################
+
+_:ethereum <type> "executor_type" .
+_:ethereum <name> "Ethereum" .
+_:ethereum <command> _:ethereumCmdTransfer .
+_:ethereum <command> _:ethereumCmdContract .
+_:ethereum <event> _:ethereumEvtTransaction .
+_:ethereum <event> _:ethereumEvtLog .
+
+_:ethereumCmdTransfer <type> "executor_command" .
+_:ethereumCmdTransfer <name> "transfert" .
+
+_:ethereumCmdContract <type> "executor_command" .
+_:ethereumCmdContract <name> "call a contract" .
+
+_:ethereumEvtTransaction <type> "executor_event" .
+_:ethereumEvtTransaction <name> "on transaction" .
+
+_:ethereumEvtLog <type> "executor_event" .
+_:ethereumEvtLog <name> "on contract event" .
+
+
+_:webhook <type> "executor_type" .
+_:webhook <name> "Webhook" .
+_:webhook <command> _:webhookCmdSend .
+_:webhook <event> _:webhookEvtReceived .
+
+_:webhookCmdSend <type> "executor_command" .
+_:webhookCmdSend <name> "send a webhook" .
+
+_:webhookEvtReceived <type> "executor_event" .
+_:webhookEvtReceived <name> "Request received" .
+
+################
+# Runners with ip and public keys with there executors
+################
+
+_:runner1 <type> "runner" .
+_:runner1 <ip> "127.0.0.1" .
+_:runner1 <publicKey> "qefi3rgi31urbeifuiugqbfebkeuqbiu319oiv" .
+_:runner1 <name> "runner 1" .
+_:runner1 <executor> _:ethereum1 .
+_:ethereum1 <type> "executor" .
+_:ethereum1 <runner> _:runner1 .
+_:ethereum1 <created> "2017-12-21T10:00:00" .
+_:ethereum1 <name> "Ethereum runner #1" .
+
+_:runner2 <type> "runner" .
+_:runner2 <ip> "127.0.0.2" .
+_:runner2 <publicKey> "qeeffqefe33rjk1b3kbj31rkjb41krjb24kjbt" .
+_:runner2 <name> "runner 2" .
+_:runner2 <executor> _:ethereum2 .
+_:runner2 <executor> _:webhook1 .
+_:ethereum2 <type> "executor" .
+_:ethereum2 <runner> _:runner2 .
+_:ethereum2 <name> "Ethereum runner #2" .
+_:ethereum2 <created> "2017-12-21T05:00:00" .
+_:webhook1 <type> "executor" .
+_:webhook1 <runner> _:runner2 .
+_:webhook1 <name> "Webhook runner #2" .
+_:webhook1 <created> "2017-12-21T05:10:00" .
+
+
+################
+# Config
+################
+
+_:ethTxOnWebhook <type> "config" .
+_:ethTxOnWebhook <name> "Send eth when receive POST request" .
+_:ethTxOnWebhook <from> _:webhookEvtReceived .
+_:ethTxOnWebhook <to> _:ethereumCmdTransfer .
+
+################
+# Event + Verification
+################
+
+# _:event1 <type> "event" .
+# _:event1 <name> "ETH_MAINNET" .
+
+# _:verif1 <type> "verification" .
