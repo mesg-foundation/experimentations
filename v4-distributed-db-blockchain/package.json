@@ -5,11 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index"
+    "start": "node index",
+    "truffle": "truffle"
   },
   "author": "Anthony Estebe <contact@anthonyestebe.com> (http://microblog.anthonyestebe.com/)",
   "license": "ISC",
   "dependencies": {
     "web3": "^1.0.0-beta.27"
+  },
+  "devDependencies": {
+    "truffle": "^4.0.4"
   }
 }
