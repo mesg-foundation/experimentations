@@ -56,7 +56,7 @@ contract('MesgStorage', async accounts => {
     await promisifyAll(votes, (vote, i) => contract
       .add(runner, id, vote, { from: accounts[i] })
     )
-    assert.equal(await contract.mesgBestValueCount.call(runner, id), votes.filter(x => x === good).length)
+    assert.equal((await contract.mesgBestValueCount.call(runner, id)).toNumber(), votes.filter(x => x === good).length)
   })
   it ('should not trigger the confirmed event', async () => {
     const contract = await MesgStorage.deployed()

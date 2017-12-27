@@ -85,10 +85,10 @@ contract MesgStorage {
   }
 
   function canConfirm(string runnerType, string mesgIdentifier) private view returns (bool) {
-    // if (state(runnerType, mesgIdentifier) != Status.Pending) {
-    //   return false;
-    // }
     Mesg storage mesg = m_runners[runnerType].mesgMap[mesgIdentifier];
+    if (mesg.status != Status.Pending) {
+      return false;
+    }
     uint bestSubmissionTotal = mesg.encryptedValuesCount[mesg.bestValue];
     if (bestSubmissionTotal < minConfirmationsNumber) {
       return false;
