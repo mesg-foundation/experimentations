@@ -1,0 +1,29 @@
+scalar DateTime
+
+type Workflow {
+  id: String!
+  disabledAt: DateTime
+}
+input WorkflowInput {
+  id: String!
+}
+
+type Mutation {
+  createWorkflow(workflow: WorkflowInput): Workflow!
+  deleteWorkflow(id: String!): Workflow!
+}
+
+type Query {
+  allWorkflows: [Workflow]!
+  workflow(id: String): Workflow
+}
+
+type Subscription {
+  workflow: Workflow
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
