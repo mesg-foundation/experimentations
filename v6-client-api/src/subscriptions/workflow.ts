@@ -1,3 +1,5 @@
 import { pubsub } from "../pubsub"
 
-export default (parent, args) => pubsub.asyncIterator('WorkflowCreated')
+export default {
+  subscribe: (parent, args) => pubsub.asyncIterator('WorkflowCreated')
+}
