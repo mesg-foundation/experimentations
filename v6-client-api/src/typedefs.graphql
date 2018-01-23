@@ -4,6 +4,7 @@ type Workflow {
   id: String!
   disabledAt: DateTime
 }
+
 input WorkflowInput {
   id: String!
 }
