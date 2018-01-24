@@ -3,11 +3,6 @@ import resolvers from './resolvers'
 
 const server = new GraphQLServer({
   typeDefs: "./src/typedefs.graphql",
-  resolvers,
-  context: {
-    foo: 'bar'
-  }
+  resolvers
 })
-server.start({
-  playground: "/playground",
-}, ({ port }) => console.log(`Server running on localhost:${port}`))
+server.start(({ port }) => console.log(`Server running on localhost:${port}`))

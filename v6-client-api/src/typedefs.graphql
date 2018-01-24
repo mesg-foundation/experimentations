@@ -1,17 +1,129 @@
-scalar DateTime
+scalar Date
 
-type Workflow {
-  id: String!
-  disabledAt: DateTime
+enum TYPE {
+  FLOAT
+  INTEGER
+  STRING
+  BOOLEAN
+  DATE
 }
 
-input WorkflowInput {
-  id: String!
+enum PREDICATE {
+  EQ
+  NEQ
+  GT
+  GTEQ
+  LT
+  LTEQ
+  MATCHES
+  DOES_NOT_MATCH
+  START
+  NOT_START
+  END
+  NOT_END
+  IN
+  NOT_IN
+  CONT
+  NOT_CONT
 }
 
-type Mutation {
-  createWorkflow(workflow: WorkflowInput): Workflow!
-  deleteWorkflow(id: String!): Workflow!
+interface Blacklistable {
+  whitelist: [Runner]! # default: []
+  blacklist: [Runner]! # default: []
+}
+
+interface Descriptable {
+  title: String!
+  description: String
+}
+
+interface Monitorable {
+  duration: Int!
+  fee: Int!
+}
+
+type Runner {
+  publicKey: String! # unique
+  stake: Float! # default: 0
+  reliability: Float! # default: 100%
+}
+
+type Parameter implements Descriptable {
+  title: String!
+  description: String
+  type: TYPE!
+  required: Boolean! # default: false
+}
+
+type FilterDefinition {
+  parameter: Parameter!
+  predicate: PREDICATE! # default: EQ
+  value: String!
+}
+
+type Event implements Descriptable {
+  title: String!
+  description: String
+  data: [Parameter]! # default: []
+}
+
+type Command implements Descriptable {
+  title: String!
+  description: String
+  arguments: [Parameter]! # default: []
+}
+
+type Service implements Descriptable {
+  title: String!
+  description: String
+  events: [Event]! # default: []
+  commands: [Command]! # default: []
+}
+
+type WorkflowConstant {
+  value: String!
+}
+
+type WorkflowSource implements Blacklistable {
+  whitelist: [Runner]! # default: []
+  blacklist: [Runner]! # default: []
+  service: Service!
+  event: Event!
+  filters: [FilterDefinition]! # default: []
+}
+
+type WorkflowCommand implements Blacklistable {
+  whitelist: [Runner]! # default: []
+  blacklist: [Runner]! # default: []
+  service: Service!
+  command: Command!
+  parameters: WorkflowResult!
+}
+
+type WorkflowResult {
+  reference: Parameter!
+  value: String!
+}
+
+type Workflow implements Descriptable {
+  title: String!
+  description: String
+  source: WorkflowSource!
+  commands: [WorkflowCommand]!
+
+  executions: [WorkflowExecution]!
+}
+
+type WorkflowExecution implements Monitorable {
+  duration: Int!
+  fee: Int!
+  commandExecutions: [WorkflowCommandExecution]!
+}
+
+type WorkflowCommandExecution implements Monitorable {
+  duration: Int!
+  fee: Int!
+  results: [WorkflowResult]!
 }
 
 type Query {
@@ -19,12 +131,6 @@ type Query {
   workflow(id: String): Workflow
 }
 
-type Subscription {
-  workflow: Workflow
-}
-
 schema {
   query: Query
-  mutation: Mutation
-  subscription: Subscription
 }
