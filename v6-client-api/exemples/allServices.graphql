@@ -1,0 +1,34 @@
+fragment parameter on Parameter {
+  id
+  title
+  description
+  type
+  required
+}
+
+fragment service on Service {
+  id
+  title
+  description
+  events {
+    id
+    title
+    description
+    data {
+      ...parameter
+    }
+  }
+  tasks {
+    id
+    title
+    description
+    arguments {
+      ...parameter 
+    }
+  }
+}
+{
+  allservices: services {
+    ...service
+  }
+}

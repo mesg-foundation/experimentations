@@ -1,0 +1,176 @@
+mutation {
+  runner1: createRunner(data: {
+    publicKey: "publickey#1",
+    stake: 100,
+    reliability: 84.23
+  }) { id }
+
+  runner2: createRunner(data: {
+    publicKey: "publickey#2",
+    stake: 50,
+    reliability: 92.30
+  }) { id }
+
+  runner3: createRunner(data: {
+    publicKey: "publickey#3",
+    stake: 75,
+    reliability: 88.34
+  }) { id }
+
+  service_ethereum: createService(data: {
+    title: "Ethereum",
+    description: "Connect to Ethereum blockchain",
+    events: {
+      create: [
+        {
+          title: "onTransaction",
+          description: "Everytime a new transaction occurs",
+          data: {
+            create: [
+              {
+                title: "Transaction Hash",
+                type: STRING,
+              }, {
+                title: "Fees",
+                type: INTEGER,
+              }, {
+                title: "From",
+                type: STRING,
+              }, {
+                title: "To",
+                type: STRING,            
+              }
+            ]
+          }
+        }, {
+          title: "onEvent",
+          description: "Everytime an event occurs",
+          data: {
+            create: [
+              {
+                title: "Transaction Hash",
+                type: STRING,
+              }, {
+                title: "Fees",
+                type: INTEGER,
+              }, {
+                title: "Payload",
+                type: OBJECT,
+              }
+            ]
+          }
+        }
+      ]
+    },
+    tasks: {
+      create: [
+        {
+          title: "sendSignedTransaction",
+          description: "Send a transaction that has been already signed",
+          arguments: {
+            create: [
+              {
+                title: "signature",
+                description: "Signature of the transaction",
+                type: STRING
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }) { id }
+  service_webhook: createService(data: {
+    title: "Webhook",
+    description: "Call a webhook",
+    events: {
+      create: [
+        {
+          title: "response",
+          description: "Webhook response",
+          data: {
+            create: [
+              {
+                title: "status",
+                type: INTEGER                 ,
+              }, {
+                title: "data",
+                type: OBJECT,
+              }
+            ]
+          }
+        }
+      ]
+    },
+    tasks: {
+      create: [
+        {
+          title: "send",
+          description: "Send a webhook to a specify url",
+          arguments: {
+            create: [
+              {
+                title: "url",
+                description: "URL to send the request",
+                type: STRING
+              },
+              {
+                title: "payload",
+                description: "Data that needs to be send",
+                type: OBJECT
+              },
+              {
+                title: "headers"
+                description: "Specific headers for the request",
+                type: OBJECT,
+                required: false
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }) { id }
+  service_function: createService(data: {
+    title: "Function",
+    description: "Execute a function",
+    events: {
+      create: [
+        {
+          title: "onResult",
+          description: "Function result",
+          data: {
+            create: [
+              {
+                title: "data",
+                type: OBJECT,
+              }
+            ]
+          }
+        }
+      ]
+    },
+    tasks: {
+      create: [
+        {
+          title: "executeJavascript",
+          description: "Execute a function",
+          arguments: {
+            create: [
+              {
+                title: "code",
+                description: "Code for the function in javascript",
+                type: STRING
+              },
+              {
+                title: "payload",
+                description: "Data that needs to be passed to the function",
+                type: OBJECT
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }) { id }
+}

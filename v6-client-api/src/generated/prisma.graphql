@@ -5,13 +5,6 @@
 # Model Types
 #
 
-type Command implements Node {
-  id: ID!
-  title: String!
-  description: String
-  arguments(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Parameter!]
-}
-
 type Event implements Node {
   id: ID!
   title: String!
@@ -31,7 +24,7 @@ type Parameter implements Node {
   title: String!
   description: String
   type: TYPE!
-  required: Boolean!
+  required: Boolean
 }
 
 type Runner implements Node {
@@ -41,8 +34,8 @@ type Runner implements Node {
   reliability: Float!
   sourceWhitelisted(where: WorkflowSourceWhereInput, orderBy: WorkflowSourceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowSource!]
   sourceBlacklisted(where: WorkflowSourceWhereInput, orderBy: WorkflowSourceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowSource!]
-  commandWhitelisted(where: WorkflowCommandWhereInput, orderBy: WorkflowCommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowCommand!]
-  commandBlacklisted(where: WorkflowCommandWhereInput, orderBy: WorkflowCommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowCommand!]
+  taskWhitelisted(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTask!]
+  taskBlacklisted(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTask!]
 }
 
 type Service implements Node {
@@ -50,7 +43,14 @@ type Service implements Node {
   title: String!
   description: String
   events(where: EventWhereInput, orderBy: EventOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Event!]
-  commands(where: CommandWhereInput, orderBy: CommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Command!]
+  tasks(where: TaskWhereInput, orderBy: TaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Task!]
+}
+
+type Task implements Node {
+  id: ID!
+  title: String!
+  description: String
+  arguments(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Parameter!]
 }
 
 type Workflow implements Node {
@@ -58,24 +58,8 @@ type Workflow implements Node {
   title: String!
   description: String
   source(where: WorkflowSourceWhereInput): WorkflowSource!
-  commands(where: WorkflowCommandWhereInput, orderBy: WorkflowCommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowCommand!]
+  tasks(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTask!]
   executions(where: WorkflowExecutionWhereInput, orderBy: WorkflowExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowExecution!]
-}
-
-type WorkflowCommand implements Node {
-  id: ID!
-  whitelist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
-  blacklist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
-  service(where: ServiceWhereInput): Service!
-  command(where: CommandWhereInput): Command!
-  parameters(where: WorkflowResultWhereInput): WorkflowResult!
-}
-
-type WorkflowCommandExecution implements Node {
-  id: ID!
-  duration: Int!
-  fee: Int!
-  results(where: WorkflowResultWhereInput, orderBy: WorkflowResultOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowResult!]
 }
 
 type WorkflowConstant implements Node {
@@ -87,7 +71,7 @@ type WorkflowExecution implements Node {
   id: ID!
   duration: Int!
   fee: Int!
-  commandExecutions(where: WorkflowCommandExecutionWhereInput, orderBy: WorkflowCommandExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowCommandExecution!]
+  taskExecutions(where: WorkflowTaskExecutionWhereInput, orderBy: WorkflowTaskExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTaskExecution!]
 }
 
 type WorkflowResult implements Node {
@@ -105,14 +89,28 @@ type WorkflowSource implements Node {
   filters(where: FilterDefinitionWhereInput, orderBy: FilterDefinitionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [FilterDefinition!]
 }
 
+type WorkflowTask implements Node {
+  id: ID!
+  whitelist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
+  blacklist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
+  service(where: ServiceWhereInput): Service!
+  task(where: TaskWhereInput): Task!
+  parameters(where: WorkflowResultWhereInput, orderBy: WorkflowResultOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowResult!]
+  parents(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTask!]
+  children(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTask!]
+}
+
+type WorkflowTaskExecution implements Node {
+  id: ID!
+  duration: Int!
+  fee: Int!
+  results(where: WorkflowResultWhereInput, orderBy: WorkflowResultOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowResult!]
+}
+
 
 #
 # Other Types
 #
-
-type AggregateCommand {
-  count: Int!
-}
 
 type AggregateEvent {
   count: Int!
@@ -134,15 +132,11 @@ type AggregateService {
   count: Int!
 }
 
+type AggregateTask {
+  count: Int!
+}
+
 type AggregateWorkflow {
-  count: Int!
-}
-
-type AggregateWorkflowCommand {
-  count: Int!
-}
-
-type AggregateWorkflowCommandExecution {
   count: Int!
 }
 
@@ -162,145 +156,16 @@ type AggregateWorkflowSource {
   count: Int!
 }
 
+type AggregateWorkflowTask {
+  count: Int!
+}
+
+type AggregateWorkflowTaskExecution {
+  count: Int!
+}
+
 type BatchPayload {
   count: Long!
-}
-
-type CommandConnection {
-  pageInfo: PageInfo!
-  edges: [CommandEdge]!
-  aggregate: AggregateCommand!
-}
-
-input CommandCreateInput {
-  title: String!
-  description: String
-  arguments: ParameterCreateManyInput
-}
-
-input CommandCreateManyInput {
-  create: [CommandCreateInput!]
-  connect: [CommandWhereUniqueInput!]
-}
-
-input CommandCreateOneInput {
-  create: CommandCreateInput
-  connect: CommandWhereUniqueInput
-}
-
-type CommandEdge {
-  node: Command!
-  cursor: String!
-}
-
-enum CommandOrderByInput {
-  id_ASC
-  id_DESC
-  title_ASC
-  title_DESC
-  description_ASC
-  description_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type CommandPreviousValues {
-  id: ID!
-  title: String!
-  description: String
-}
-
-type CommandSubscriptionPayload {
-  mutation: MutationType!
-  node: Command
-  updatedFields: [String!]
-  previousValues: CommandPreviousValues
-}
-
-input CommandSubscriptionWhereInput {
-  AND: [CommandSubscriptionWhereInput!]
-  OR: [CommandSubscriptionWhereInput!]
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: CommandWhereInput
-}
-
-input CommandUpdateInput {
-  title: String
-  description: String
-  arguments: ParameterUpdateManyInput
-}
-
-input CommandUpdateManyInput {
-  create: [CommandCreateInput!]
-  connect: [CommandWhereUniqueInput!]
-  disconnect: [CommandWhereUniqueInput!]
-  delete: [CommandWhereUniqueInput!]
-}
-
-input CommandUpdateOneInput {
-  create: CommandCreateInput
-  connect: CommandWhereUniqueInput
-  disconnect: CommandWhereUniqueInput
-  delete: CommandWhereUniqueInput
-}
-
-input CommandWhereInput {
-  AND: [CommandWhereInput!]
-  OR: [CommandWhereInput!]
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
-  description: String
-  description_not: String
-  description_in: [String!]
-  description_not_in: [String!]
-  description_lt: String
-  description_lte: String
-  description_gt: String
-  description_gte: String
-  description_contains: String
-  description_not_contains: String
-  description_starts_with: String
-  description_not_starts_with: String
-  description_ends_with: String
-  description_not_ends_with: String
-  arguments_every: ParameterWhereInput
-  arguments_some: ParameterWhereInput
-  arguments_none: ParameterWhereInput
-}
-
-input CommandWhereUniqueInput {
-  id: ID
 }
 
 type EventConnection {
@@ -560,80 +425,80 @@ type Mutation {
   createParameter(data: ParameterCreateInput!): Parameter!
   createFilterDefinition(data: FilterDefinitionCreateInput!): FilterDefinition!
   createEvent(data: EventCreateInput!): Event!
-  createCommand(data: CommandCreateInput!): Command!
+  createTask(data: TaskCreateInput!): Task!
   createService(data: ServiceCreateInput!): Service!
   createWorkflowConstant(data: WorkflowConstantCreateInput!): WorkflowConstant!
   createWorkflowSource(data: WorkflowSourceCreateInput!): WorkflowSource!
-  createWorkflowCommand(data: WorkflowCommandCreateInput!): WorkflowCommand!
+  createWorkflowTask(data: WorkflowTaskCreateInput!): WorkflowTask!
   createWorkflowResult(data: WorkflowResultCreateInput!): WorkflowResult!
   createWorkflow(data: WorkflowCreateInput!): Workflow!
   createWorkflowExecution(data: WorkflowExecutionCreateInput!): WorkflowExecution!
-  createWorkflowCommandExecution(data: WorkflowCommandExecutionCreateInput!): WorkflowCommandExecution!
+  createWorkflowTaskExecution(data: WorkflowTaskExecutionCreateInput!): WorkflowTaskExecution!
   updateRunner(data: RunnerUpdateInput!, where: RunnerWhereUniqueInput!): Runner
   updateParameter(data: ParameterUpdateInput!, where: ParameterWhereUniqueInput!): Parameter
   updateFilterDefinition(data: FilterDefinitionUpdateInput!, where: FilterDefinitionWhereUniqueInput!): FilterDefinition
   updateEvent(data: EventUpdateInput!, where: EventWhereUniqueInput!): Event
-  updateCommand(data: CommandUpdateInput!, where: CommandWhereUniqueInput!): Command
+  updateTask(data: TaskUpdateInput!, where: TaskWhereUniqueInput!): Task
   updateService(data: ServiceUpdateInput!, where: ServiceWhereUniqueInput!): Service
   updateWorkflowConstant(data: WorkflowConstantUpdateInput!, where: WorkflowConstantWhereUniqueInput!): WorkflowConstant
   updateWorkflowSource(data: WorkflowSourceUpdateInput!, where: WorkflowSourceWhereUniqueInput!): WorkflowSource
-  updateWorkflowCommand(data: WorkflowCommandUpdateInput!, where: WorkflowCommandWhereUniqueInput!): WorkflowCommand
+  updateWorkflowTask(data: WorkflowTaskUpdateInput!, where: WorkflowTaskWhereUniqueInput!): WorkflowTask
   updateWorkflowResult(data: WorkflowResultUpdateInput!, where: WorkflowResultWhereUniqueInput!): WorkflowResult
   updateWorkflow(data: WorkflowUpdateInput!, where: WorkflowWhereUniqueInput!): Workflow
   updateWorkflowExecution(data: WorkflowExecutionUpdateInput!, where: WorkflowExecutionWhereUniqueInput!): WorkflowExecution
-  updateWorkflowCommandExecution(data: WorkflowCommandExecutionUpdateInput!, where: WorkflowCommandExecutionWhereUniqueInput!): WorkflowCommandExecution
+  updateWorkflowTaskExecution(data: WorkflowTaskExecutionUpdateInput!, where: WorkflowTaskExecutionWhereUniqueInput!): WorkflowTaskExecution
   deleteRunner(where: RunnerWhereUniqueInput!): Runner
   deleteParameter(where: ParameterWhereUniqueInput!): Parameter
   deleteFilterDefinition(where: FilterDefinitionWhereUniqueInput!): FilterDefinition
   deleteEvent(where: EventWhereUniqueInput!): Event
-  deleteCommand(where: CommandWhereUniqueInput!): Command
+  deleteTask(where: TaskWhereUniqueInput!): Task
   deleteService(where: ServiceWhereUniqueInput!): Service
   deleteWorkflowConstant(where: WorkflowConstantWhereUniqueInput!): WorkflowConstant
   deleteWorkflowSource(where: WorkflowSourceWhereUniqueInput!): WorkflowSource
-  deleteWorkflowCommand(where: WorkflowCommandWhereUniqueInput!): WorkflowCommand
+  deleteWorkflowTask(where: WorkflowTaskWhereUniqueInput!): WorkflowTask
   deleteWorkflowResult(where: WorkflowResultWhereUniqueInput!): WorkflowResult
   deleteWorkflow(where: WorkflowWhereUniqueInput!): Workflow
   deleteWorkflowExecution(where: WorkflowExecutionWhereUniqueInput!): WorkflowExecution
-  deleteWorkflowCommandExecution(where: WorkflowCommandExecutionWhereUniqueInput!): WorkflowCommandExecution
+  deleteWorkflowTaskExecution(where: WorkflowTaskExecutionWhereUniqueInput!): WorkflowTaskExecution
   upsertRunner(where: RunnerWhereUniqueInput!, create: RunnerCreateInput!, update: RunnerUpdateInput!): Runner!
   upsertParameter(where: ParameterWhereUniqueInput!, create: ParameterCreateInput!, update: ParameterUpdateInput!): Parameter!
   upsertFilterDefinition(where: FilterDefinitionWhereUniqueInput!, create: FilterDefinitionCreateInput!, update: FilterDefinitionUpdateInput!): FilterDefinition!
   upsertEvent(where: EventWhereUniqueInput!, create: EventCreateInput!, update: EventUpdateInput!): Event!
-  upsertCommand(where: CommandWhereUniqueInput!, create: CommandCreateInput!, update: CommandUpdateInput!): Command!
+  upsertTask(where: TaskWhereUniqueInput!, create: TaskCreateInput!, update: TaskUpdateInput!): Task!
   upsertService(where: ServiceWhereUniqueInput!, create: ServiceCreateInput!, update: ServiceUpdateInput!): Service!
   upsertWorkflowConstant(where: WorkflowConstantWhereUniqueInput!, create: WorkflowConstantCreateInput!, update: WorkflowConstantUpdateInput!): WorkflowConstant!
   upsertWorkflowSource(where: WorkflowSourceWhereUniqueInput!, create: WorkflowSourceCreateInput!, update: WorkflowSourceUpdateInput!): WorkflowSource!
-  upsertWorkflowCommand(where: WorkflowCommandWhereUniqueInput!, create: WorkflowCommandCreateInput!, update: WorkflowCommandUpdateInput!): WorkflowCommand!
+  upsertWorkflowTask(where: WorkflowTaskWhereUniqueInput!, create: WorkflowTaskCreateInput!, update: WorkflowTaskUpdateInput!): WorkflowTask!
   upsertWorkflowResult(where: WorkflowResultWhereUniqueInput!, create: WorkflowResultCreateInput!, update: WorkflowResultUpdateInput!): WorkflowResult!
   upsertWorkflow(where: WorkflowWhereUniqueInput!, create: WorkflowCreateInput!, update: WorkflowUpdateInput!): Workflow!
   upsertWorkflowExecution(where: WorkflowExecutionWhereUniqueInput!, create: WorkflowExecutionCreateInput!, update: WorkflowExecutionUpdateInput!): WorkflowExecution!
-  upsertWorkflowCommandExecution(where: WorkflowCommandExecutionWhereUniqueInput!, create: WorkflowCommandExecutionCreateInput!, update: WorkflowCommandExecutionUpdateInput!): WorkflowCommandExecution!
+  upsertWorkflowTaskExecution(where: WorkflowTaskExecutionWhereUniqueInput!, create: WorkflowTaskExecutionCreateInput!, update: WorkflowTaskExecutionUpdateInput!): WorkflowTaskExecution!
   updateManyRunners(data: RunnerUpdateInput!, where: RunnerWhereInput!): BatchPayload!
   updateManyParameters(data: ParameterUpdateInput!, where: ParameterWhereInput!): BatchPayload!
   updateManyFilterDefinitions(data: FilterDefinitionUpdateInput!, where: FilterDefinitionWhereInput!): BatchPayload!
   updateManyEvents(data: EventUpdateInput!, where: EventWhereInput!): BatchPayload!
-  updateManyCommands(data: CommandUpdateInput!, where: CommandWhereInput!): BatchPayload!
+  updateManyTasks(data: TaskUpdateInput!, where: TaskWhereInput!): BatchPayload!
   updateManyServices(data: ServiceUpdateInput!, where: ServiceWhereInput!): BatchPayload!
   updateManyWorkflowConstants(data: WorkflowConstantUpdateInput!, where: WorkflowConstantWhereInput!): BatchPayload!
   updateManyWorkflowSources(data: WorkflowSourceUpdateInput!, where: WorkflowSourceWhereInput!): BatchPayload!
-  updateManyWorkflowCommands(data: WorkflowCommandUpdateInput!, where: WorkflowCommandWhereInput!): BatchPayload!
+  updateManyWorkflowTasks(data: WorkflowTaskUpdateInput!, where: WorkflowTaskWhereInput!): BatchPayload!
   updateManyWorkflowResults(data: WorkflowResultUpdateInput!, where: WorkflowResultWhereInput!): BatchPayload!
   updateManyWorkflows(data: WorkflowUpdateInput!, where: WorkflowWhereInput!): BatchPayload!
   updateManyWorkflowExecutions(data: WorkflowExecutionUpdateInput!, where: WorkflowExecutionWhereInput!): BatchPayload!
-  updateManyWorkflowCommandExecutions(data: WorkflowCommandExecutionUpdateInput!, where: WorkflowCommandExecutionWhereInput!): BatchPayload!
+  updateManyWorkflowTaskExecutions(data: WorkflowTaskExecutionUpdateInput!, where: WorkflowTaskExecutionWhereInput!): BatchPayload!
   deleteManyRunners(where: RunnerWhereInput!): BatchPayload!
   deleteManyParameters(where: ParameterWhereInput!): BatchPayload!
   deleteManyFilterDefinitions(where: FilterDefinitionWhereInput!): BatchPayload!
   deleteManyEvents(where: EventWhereInput!): BatchPayload!
-  deleteManyCommands(where: CommandWhereInput!): BatchPayload!
+  deleteManyTasks(where: TaskWhereInput!): BatchPayload!
   deleteManyServices(where: ServiceWhereInput!): BatchPayload!
   deleteManyWorkflowConstants(where: WorkflowConstantWhereInput!): BatchPayload!
   deleteManyWorkflowSources(where: WorkflowSourceWhereInput!): BatchPayload!
-  deleteManyWorkflowCommands(where: WorkflowCommandWhereInput!): BatchPayload!
+  deleteManyWorkflowTasks(where: WorkflowTaskWhereInput!): BatchPayload!
   deleteManyWorkflowResults(where: WorkflowResultWhereInput!): BatchPayload!
   deleteManyWorkflows(where: WorkflowWhereInput!): BatchPayload!
   deleteManyWorkflowExecutions(where: WorkflowExecutionWhereInput!): BatchPayload!
-  deleteManyWorkflowCommandExecutions(where: WorkflowCommandExecutionWhereInput!): BatchPayload!
+  deleteManyWorkflowTaskExecutions(where: WorkflowTaskExecutionWhereInput!): BatchPayload!
 }
 
 enum MutationType {
@@ -663,7 +528,7 @@ input ParameterCreateInput {
   title: String!
   description: String
   type: TYPE
-  required: Boolean!
+  required: Boolean
 }
 
 input ParameterCreateManyInput {
@@ -703,7 +568,7 @@ type ParameterPreviousValues {
   title: String!
   description: String
   type: TYPE!
-  required: Boolean!
+  required: Boolean
 }
 
 type ParameterSubscriptionPayload {
@@ -825,41 +690,41 @@ type Query {
   parameters(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Parameter]!
   filterDefinitions(where: FilterDefinitionWhereInput, orderBy: FilterDefinitionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [FilterDefinition]!
   events(where: EventWhereInput, orderBy: EventOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Event]!
-  commands(where: CommandWhereInput, orderBy: CommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Command]!
+  tasks(where: TaskWhereInput, orderBy: TaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Task]!
   services(where: ServiceWhereInput, orderBy: ServiceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Service]!
   workflowConstants(where: WorkflowConstantWhereInput, orderBy: WorkflowConstantOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowConstant]!
   workflowSources(where: WorkflowSourceWhereInput, orderBy: WorkflowSourceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowSource]!
-  workflowCommands(where: WorkflowCommandWhereInput, orderBy: WorkflowCommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowCommand]!
+  workflowTasks(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTask]!
   workflowResults(where: WorkflowResultWhereInput, orderBy: WorkflowResultOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowResult]!
   workflows(where: WorkflowWhereInput, orderBy: WorkflowOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Workflow]!
   workflowExecutions(where: WorkflowExecutionWhereInput, orderBy: WorkflowExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowExecution]!
-  workflowCommandExecutions(where: WorkflowCommandExecutionWhereInput, orderBy: WorkflowCommandExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowCommandExecution]!
+  workflowTaskExecutions(where: WorkflowTaskExecutionWhereInput, orderBy: WorkflowTaskExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTaskExecution]!
   runner(where: RunnerWhereUniqueInput!): Runner
   parameter(where: ParameterWhereUniqueInput!): Parameter
   filterDefinition(where: FilterDefinitionWhereUniqueInput!): FilterDefinition
   event(where: EventWhereUniqueInput!): Event
-  command(where: CommandWhereUniqueInput!): Command
+  task(where: TaskWhereUniqueInput!): Task
   service(where: ServiceWhereUniqueInput!): Service
   workflowConstant(where: WorkflowConstantWhereUniqueInput!): WorkflowConstant
   workflowSource(where: WorkflowSourceWhereUniqueInput!): WorkflowSource
-  workflowCommand(where: WorkflowCommandWhereUniqueInput!): WorkflowCommand
+  workflowTask(where: WorkflowTaskWhereUniqueInput!): WorkflowTask
   workflowResult(where: WorkflowResultWhereUniqueInput!): WorkflowResult
   workflow(where: WorkflowWhereUniqueInput!): Workflow
   workflowExecution(where: WorkflowExecutionWhereUniqueInput!): WorkflowExecution
-  workflowCommandExecution(where: WorkflowCommandExecutionWhereUniqueInput!): WorkflowCommandExecution
+  workflowTaskExecution(where: WorkflowTaskExecutionWhereUniqueInput!): WorkflowTaskExecution
   runnersConnection(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RunnerConnection!
   parametersConnection(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ParameterConnection!
   filterDefinitionsConnection(where: FilterDefinitionWhereInput, orderBy: FilterDefinitionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FilterDefinitionConnection!
   eventsConnection(where: EventWhereInput, orderBy: EventOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): EventConnection!
-  commandsConnection(where: CommandWhereInput, orderBy: CommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CommandConnection!
+  tasksConnection(where: TaskWhereInput, orderBy: TaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TaskConnection!
   servicesConnection(where: ServiceWhereInput, orderBy: ServiceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ServiceConnection!
   workflowConstantsConnection(where: WorkflowConstantWhereInput, orderBy: WorkflowConstantOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowConstantConnection!
   workflowSourcesConnection(where: WorkflowSourceWhereInput, orderBy: WorkflowSourceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowSourceConnection!
-  workflowCommandsConnection(where: WorkflowCommandWhereInput, orderBy: WorkflowCommandOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowCommandConnection!
+  workflowTasksConnection(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowTaskConnection!
   workflowResultsConnection(where: WorkflowResultWhereInput, orderBy: WorkflowResultOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowResultConnection!
   workflowsConnection(where: WorkflowWhereInput, orderBy: WorkflowOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowConnection!
   workflowExecutionsConnection(where: WorkflowExecutionWhereInput, orderBy: WorkflowExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowExecutionConnection!
-  workflowCommandExecutionsConnection(where: WorkflowCommandExecutionWhereInput, orderBy: WorkflowCommandExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowCommandExecutionConnection!
+  workflowTaskExecutionsConnection(where: WorkflowTaskExecutionWhereInput, orderBy: WorkflowTaskExecutionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WorkflowTaskExecutionConnection!
   node(id: ID!): Node
 }
 
@@ -875,18 +740,8 @@ input RunnerCreateInput {
   reliability: Float
   sourceWhitelisted: WorkflowSourceCreateManyWithoutWhitelistInput
   sourceBlacklisted: WorkflowSourceCreateManyWithoutBlacklistInput
-  commandWhitelisted: WorkflowCommandCreateManyWithoutWhitelistInput
-  commandBlacklisted: WorkflowCommandCreateManyWithoutBlacklistInput
-}
-
-input RunnerCreateManyWithoutCommandBlacklistedInput {
-  create: [RunnerCreateWithoutCommandBlacklistedInput!]
-  connect: [RunnerWhereUniqueInput!]
-}
-
-input RunnerCreateManyWithoutCommandWhitelistedInput {
-  create: [RunnerCreateWithoutCommandWhitelistedInput!]
-  connect: [RunnerWhereUniqueInput!]
+  taskWhitelisted: WorkflowTaskCreateManyWithoutWhitelistInput
+  taskBlacklisted: WorkflowTaskCreateManyWithoutBlacklistInput
 }
 
 input RunnerCreateManyWithoutSourceBlacklistedInput {
@@ -899,22 +754,14 @@ input RunnerCreateManyWithoutSourceWhitelistedInput {
   connect: [RunnerWhereUniqueInput!]
 }
 
-input RunnerCreateWithoutCommandBlacklistedInput {
-  publicKey: String!
-  stake: Float
-  reliability: Float
-  sourceWhitelisted: WorkflowSourceCreateManyWithoutWhitelistInput
-  sourceBlacklisted: WorkflowSourceCreateManyWithoutBlacklistInput
-  commandWhitelisted: WorkflowCommandCreateManyWithoutWhitelistInput
+input RunnerCreateManyWithoutTaskBlacklistedInput {
+  create: [RunnerCreateWithoutTaskBlacklistedInput!]
+  connect: [RunnerWhereUniqueInput!]
 }
 
-input RunnerCreateWithoutCommandWhitelistedInput {
-  publicKey: String!
-  stake: Float
-  reliability: Float
-  sourceWhitelisted: WorkflowSourceCreateManyWithoutWhitelistInput
-  sourceBlacklisted: WorkflowSourceCreateManyWithoutBlacklistInput
-  commandBlacklisted: WorkflowCommandCreateManyWithoutBlacklistInput
+input RunnerCreateManyWithoutTaskWhitelistedInput {
+  create: [RunnerCreateWithoutTaskWhitelistedInput!]
+  connect: [RunnerWhereUniqueInput!]
 }
 
 input RunnerCreateWithoutSourceBlacklistedInput {
@@ -922,8 +769,8 @@ input RunnerCreateWithoutSourceBlacklistedInput {
   stake: Float
   reliability: Float
   sourceWhitelisted: WorkflowSourceCreateManyWithoutWhitelistInput
-  commandWhitelisted: WorkflowCommandCreateManyWithoutWhitelistInput
-  commandBlacklisted: WorkflowCommandCreateManyWithoutBlacklistInput
+  taskWhitelisted: WorkflowTaskCreateManyWithoutWhitelistInput
+  taskBlacklisted: WorkflowTaskCreateManyWithoutBlacklistInput
 }
 
 input RunnerCreateWithoutSourceWhitelistedInput {
@@ -931,8 +778,26 @@ input RunnerCreateWithoutSourceWhitelistedInput {
   stake: Float
   reliability: Float
   sourceBlacklisted: WorkflowSourceCreateManyWithoutBlacklistInput
-  commandWhitelisted: WorkflowCommandCreateManyWithoutWhitelistInput
-  commandBlacklisted: WorkflowCommandCreateManyWithoutBlacklistInput
+  taskWhitelisted: WorkflowTaskCreateManyWithoutWhitelistInput
+  taskBlacklisted: WorkflowTaskCreateManyWithoutBlacklistInput
+}
+
+input RunnerCreateWithoutTaskBlacklistedInput {
+  publicKey: String!
+  stake: Float
+  reliability: Float
+  sourceWhitelisted: WorkflowSourceCreateManyWithoutWhitelistInput
+  sourceBlacklisted: WorkflowSourceCreateManyWithoutBlacklistInput
+  taskWhitelisted: WorkflowTaskCreateManyWithoutWhitelistInput
+}
+
+input RunnerCreateWithoutTaskWhitelistedInput {
+  publicKey: String!
+  stake: Float
+  reliability: Float
+  sourceWhitelisted: WorkflowSourceCreateManyWithoutWhitelistInput
+  sourceBlacklisted: WorkflowSourceCreateManyWithoutBlacklistInput
+  taskBlacklisted: WorkflowTaskCreateManyWithoutBlacklistInput
 }
 
 type RunnerEdge {
@@ -985,26 +850,8 @@ input RunnerUpdateInput {
   reliability: Float
   sourceWhitelisted: WorkflowSourceUpdateManyWithoutWhitelistInput
   sourceBlacklisted: WorkflowSourceUpdateManyWithoutBlacklistInput
-  commandWhitelisted: WorkflowCommandUpdateManyWithoutWhitelistInput
-  commandBlacklisted: WorkflowCommandUpdateManyWithoutBlacklistInput
-}
-
-input RunnerUpdateManyWithoutCommandBlacklistedInput {
-  create: [RunnerCreateWithoutCommandBlacklistedInput!]
-  connect: [RunnerWhereUniqueInput!]
-  disconnect: [RunnerWhereUniqueInput!]
-  delete: [RunnerWhereUniqueInput!]
-  update: [RunnerUpdateWithoutCommandBlacklistedInput!]
-  upsert: [RunnerUpsertWithoutCommandBlacklistedInput!]
-}
-
-input RunnerUpdateManyWithoutCommandWhitelistedInput {
-  create: [RunnerCreateWithoutCommandWhitelistedInput!]
-  connect: [RunnerWhereUniqueInput!]
-  disconnect: [RunnerWhereUniqueInput!]
-  delete: [RunnerWhereUniqueInput!]
-  update: [RunnerUpdateWithoutCommandWhitelistedInput!]
-  upsert: [RunnerUpsertWithoutCommandWhitelistedInput!]
+  taskWhitelisted: WorkflowTaskUpdateManyWithoutWhitelistInput
+  taskBlacklisted: WorkflowTaskUpdateManyWithoutBlacklistInput
 }
 
 input RunnerUpdateManyWithoutSourceBlacklistedInput {
@@ -1025,32 +872,22 @@ input RunnerUpdateManyWithoutSourceWhitelistedInput {
   upsert: [RunnerUpsertWithoutSourceWhitelistedInput!]
 }
 
-input RunnerUpdateWithoutCommandBlacklistedDataInput {
-  publicKey: String
-  stake: Float
-  reliability: Float
-  sourceWhitelisted: WorkflowSourceUpdateManyWithoutWhitelistInput
-  sourceBlacklisted: WorkflowSourceUpdateManyWithoutBlacklistInput
-  commandWhitelisted: WorkflowCommandUpdateManyWithoutWhitelistInput
+input RunnerUpdateManyWithoutTaskBlacklistedInput {
+  create: [RunnerCreateWithoutTaskBlacklistedInput!]
+  connect: [RunnerWhereUniqueInput!]
+  disconnect: [RunnerWhereUniqueInput!]
+  delete: [RunnerWhereUniqueInput!]
+  update: [RunnerUpdateWithoutTaskBlacklistedInput!]
+  upsert: [RunnerUpsertWithoutTaskBlacklistedInput!]
 }
 
-input RunnerUpdateWithoutCommandBlacklistedInput {
-  where: RunnerWhereUniqueInput!
-  data: RunnerUpdateWithoutCommandBlacklistedDataInput!
-}
-
-input RunnerUpdateWithoutCommandWhitelistedDataInput {
-  publicKey: String
-  stake: Float
-  reliability: Float
-  sourceWhitelisted: WorkflowSourceUpdateManyWithoutWhitelistInput
-  sourceBlacklisted: WorkflowSourceUpdateManyWithoutBlacklistInput
-  commandBlacklisted: WorkflowCommandUpdateManyWithoutBlacklistInput
-}
-
-input RunnerUpdateWithoutCommandWhitelistedInput {
-  where: RunnerWhereUniqueInput!
-  data: RunnerUpdateWithoutCommandWhitelistedDataInput!
+input RunnerUpdateManyWithoutTaskWhitelistedInput {
+  create: [RunnerCreateWithoutTaskWhitelistedInput!]
+  connect: [RunnerWhereUniqueInput!]
+  disconnect: [RunnerWhereUniqueInput!]
+  delete: [RunnerWhereUniqueInput!]
+  update: [RunnerUpdateWithoutTaskWhitelistedInput!]
+  upsert: [RunnerUpsertWithoutTaskWhitelistedInput!]
 }
 
 input RunnerUpdateWithoutSourceBlacklistedDataInput {
@@ -1058,8 +895,8 @@ input RunnerUpdateWithoutSourceBlacklistedDataInput {
   stake: Float
   reliability: Float
   sourceWhitelisted: WorkflowSourceUpdateManyWithoutWhitelistInput
-  commandWhitelisted: WorkflowCommandUpdateManyWithoutWhitelistInput
-  commandBlacklisted: WorkflowCommandUpdateManyWithoutBlacklistInput
+  taskWhitelisted: WorkflowTaskUpdateManyWithoutWhitelistInput
+  taskBlacklisted: WorkflowTaskUpdateManyWithoutBlacklistInput
 }
 
 input RunnerUpdateWithoutSourceBlacklistedInput {
@@ -1072,8 +909,8 @@ input RunnerUpdateWithoutSourceWhitelistedDataInput {
   stake: Float
   reliability: Float
   sourceBlacklisted: WorkflowSourceUpdateManyWithoutBlacklistInput
-  commandWhitelisted: WorkflowCommandUpdateManyWithoutWhitelistInput
-  commandBlacklisted: WorkflowCommandUpdateManyWithoutBlacklistInput
+  taskWhitelisted: WorkflowTaskUpdateManyWithoutWhitelistInput
+  taskBlacklisted: WorkflowTaskUpdateManyWithoutBlacklistInput
 }
 
 input RunnerUpdateWithoutSourceWhitelistedInput {
@@ -1081,16 +918,32 @@ input RunnerUpdateWithoutSourceWhitelistedInput {
   data: RunnerUpdateWithoutSourceWhitelistedDataInput!
 }
 
-input RunnerUpsertWithoutCommandBlacklistedInput {
-  where: RunnerWhereUniqueInput!
-  update: RunnerUpdateWithoutCommandBlacklistedDataInput!
-  create: RunnerCreateWithoutCommandBlacklistedInput!
+input RunnerUpdateWithoutTaskBlacklistedDataInput {
+  publicKey: String
+  stake: Float
+  reliability: Float
+  sourceWhitelisted: WorkflowSourceUpdateManyWithoutWhitelistInput
+  sourceBlacklisted: WorkflowSourceUpdateManyWithoutBlacklistInput
+  taskWhitelisted: WorkflowTaskUpdateManyWithoutWhitelistInput
 }
 
-input RunnerUpsertWithoutCommandWhitelistedInput {
+input RunnerUpdateWithoutTaskBlacklistedInput {
   where: RunnerWhereUniqueInput!
-  update: RunnerUpdateWithoutCommandWhitelistedDataInput!
-  create: RunnerCreateWithoutCommandWhitelistedInput!
+  data: RunnerUpdateWithoutTaskBlacklistedDataInput!
+}
+
+input RunnerUpdateWithoutTaskWhitelistedDataInput {
+  publicKey: String
+  stake: Float
+  reliability: Float
+  sourceWhitelisted: WorkflowSourceUpdateManyWithoutWhitelistInput
+  sourceBlacklisted: WorkflowSourceUpdateManyWithoutBlacklistInput
+  taskBlacklisted: WorkflowTaskUpdateManyWithoutBlacklistInput
+}
+
+input RunnerUpdateWithoutTaskWhitelistedInput {
+  where: RunnerWhereUniqueInput!
+  data: RunnerUpdateWithoutTaskWhitelistedDataInput!
 }
 
 input RunnerUpsertWithoutSourceBlacklistedInput {
@@ -1103,6 +956,18 @@ input RunnerUpsertWithoutSourceWhitelistedInput {
   where: RunnerWhereUniqueInput!
   update: RunnerUpdateWithoutSourceWhitelistedDataInput!
   create: RunnerCreateWithoutSourceWhitelistedInput!
+}
+
+input RunnerUpsertWithoutTaskBlacklistedInput {
+  where: RunnerWhereUniqueInput!
+  update: RunnerUpdateWithoutTaskBlacklistedDataInput!
+  create: RunnerCreateWithoutTaskBlacklistedInput!
+}
+
+input RunnerUpsertWithoutTaskWhitelistedInput {
+  where: RunnerWhereUniqueInput!
+  update: RunnerUpdateWithoutTaskWhitelistedDataInput!
+  create: RunnerCreateWithoutTaskWhitelistedInput!
 }
 
 input RunnerWhereInput {
@@ -1158,12 +1023,12 @@ input RunnerWhereInput {
   sourceBlacklisted_every: WorkflowSourceWhereInput
   sourceBlacklisted_some: WorkflowSourceWhereInput
   sourceBlacklisted_none: WorkflowSourceWhereInput
-  commandWhitelisted_every: WorkflowCommandWhereInput
-  commandWhitelisted_some: WorkflowCommandWhereInput
-  commandWhitelisted_none: WorkflowCommandWhereInput
-  commandBlacklisted_every: WorkflowCommandWhereInput
-  commandBlacklisted_some: WorkflowCommandWhereInput
-  commandBlacklisted_none: WorkflowCommandWhereInput
+  taskWhitelisted_every: WorkflowTaskWhereInput
+  taskWhitelisted_some: WorkflowTaskWhereInput
+  taskWhitelisted_none: WorkflowTaskWhereInput
+  taskBlacklisted_every: WorkflowTaskWhereInput
+  taskBlacklisted_some: WorkflowTaskWhereInput
+  taskBlacklisted_none: WorkflowTaskWhereInput
 }
 
 input RunnerWhereUniqueInput {
@@ -1181,7 +1046,7 @@ input ServiceCreateInput {
   title: String!
   description: String
   events: EventCreateManyInput
-  commands: CommandCreateManyInput
+  tasks: TaskCreateManyInput
 }
 
 input ServiceCreateOneInput {
@@ -1234,7 +1099,7 @@ input ServiceUpdateInput {
   title: String
   description: String
   events: EventUpdateManyInput
-  commands: CommandUpdateManyInput
+  tasks: TaskUpdateManyInput
 }
 
 input ServiceUpdateOneInput {
@@ -1292,9 +1157,9 @@ input ServiceWhereInput {
   events_every: EventWhereInput
   events_some: EventWhereInput
   events_none: EventWhereInput
-  commands_every: CommandWhereInput
-  commands_some: CommandWhereInput
-  commands_none: CommandWhereInput
+  tasks_every: TaskWhereInput
+  tasks_some: TaskWhereInput
+  tasks_none: TaskWhereInput
 }
 
 input ServiceWhereUniqueInput {
@@ -1306,15 +1171,152 @@ type Subscription {
   parameter(where: ParameterSubscriptionWhereInput): ParameterSubscriptionPayload
   filterDefinition(where: FilterDefinitionSubscriptionWhereInput): FilterDefinitionSubscriptionPayload
   event(where: EventSubscriptionWhereInput): EventSubscriptionPayload
-  command(where: CommandSubscriptionWhereInput): CommandSubscriptionPayload
+  task(where: TaskSubscriptionWhereInput): TaskSubscriptionPayload
   service(where: ServiceSubscriptionWhereInput): ServiceSubscriptionPayload
   workflowConstant(where: WorkflowConstantSubscriptionWhereInput): WorkflowConstantSubscriptionPayload
   workflowSource(where: WorkflowSourceSubscriptionWhereInput): WorkflowSourceSubscriptionPayload
-  workflowCommand(where: WorkflowCommandSubscriptionWhereInput): WorkflowCommandSubscriptionPayload
+  workflowTask(where: WorkflowTaskSubscriptionWhereInput): WorkflowTaskSubscriptionPayload
   workflowResult(where: WorkflowResultSubscriptionWhereInput): WorkflowResultSubscriptionPayload
   workflow(where: WorkflowSubscriptionWhereInput): WorkflowSubscriptionPayload
   workflowExecution(where: WorkflowExecutionSubscriptionWhereInput): WorkflowExecutionSubscriptionPayload
-  workflowCommandExecution(where: WorkflowCommandExecutionSubscriptionWhereInput): WorkflowCommandExecutionSubscriptionPayload
+  workflowTaskExecution(where: WorkflowTaskExecutionSubscriptionWhereInput): WorkflowTaskExecutionSubscriptionPayload
+}
+
+type TaskConnection {
+  pageInfo: PageInfo!
+  edges: [TaskEdge]!
+  aggregate: AggregateTask!
+}
+
+input TaskCreateInput {
+  title: String!
+  description: String
+  arguments: ParameterCreateManyInput
+}
+
+input TaskCreateManyInput {
+  create: [TaskCreateInput!]
+  connect: [TaskWhereUniqueInput!]
+}
+
+input TaskCreateOneInput {
+  create: TaskCreateInput
+  connect: TaskWhereUniqueInput
+}
+
+type TaskEdge {
+  node: Task!
+  cursor: String!
+}
+
+enum TaskOrderByInput {
+  id_ASC
+  id_DESC
+  title_ASC
+  title_DESC
+  description_ASC
+  description_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type TaskPreviousValues {
+  id: ID!
+  title: String!
+  description: String
+}
+
+type TaskSubscriptionPayload {
+  mutation: MutationType!
+  node: Task
+  updatedFields: [String!]
+  previousValues: TaskPreviousValues
+}
+
+input TaskSubscriptionWhereInput {
+  AND: [TaskSubscriptionWhereInput!]
+  OR: [TaskSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: TaskWhereInput
+}
+
+input TaskUpdateInput {
+  title: String
+  description: String
+  arguments: ParameterUpdateManyInput
+}
+
+input TaskUpdateManyInput {
+  create: [TaskCreateInput!]
+  connect: [TaskWhereUniqueInput!]
+  disconnect: [TaskWhereUniqueInput!]
+  delete: [TaskWhereUniqueInput!]
+}
+
+input TaskUpdateOneInput {
+  create: TaskCreateInput
+  connect: TaskWhereUniqueInput
+  disconnect: TaskWhereUniqueInput
+  delete: TaskWhereUniqueInput
+}
+
+input TaskWhereInput {
+  AND: [TaskWhereInput!]
+  OR: [TaskWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  description: String
+  description_not: String
+  description_in: [String!]
+  description_not_in: [String!]
+  description_lt: String
+  description_lte: String
+  description_gt: String
+  description_gte: String
+  description_contains: String
+  description_not_contains: String
+  description_starts_with: String
+  description_not_starts_with: String
+  description_ends_with: String
+  description_not_ends_with: String
+  arguments_every: ParameterWhereInput
+  arguments_some: ParameterWhereInput
+  arguments_none: ParameterWhereInput
+}
+
+input TaskWhereUniqueInput {
+  id: ID
 }
 
 enum TYPE {
@@ -1323,298 +1325,7 @@ enum TYPE {
   STRING
   BOOLEAN
   DATE
-}
-
-type WorkflowCommandConnection {
-  pageInfo: PageInfo!
-  edges: [WorkflowCommandEdge]!
-  aggregate: AggregateWorkflowCommand!
-}
-
-input WorkflowCommandCreateInput {
-  whitelist: RunnerCreateManyWithoutCommandWhitelistedInput
-  blacklist: RunnerCreateManyWithoutCommandBlacklistedInput
-  service: ServiceCreateOneInput!
-  command: CommandCreateOneInput!
-  parameters: WorkflowResultCreateOneInput!
-}
-
-input WorkflowCommandCreateManyInput {
-  create: [WorkflowCommandCreateInput!]
-  connect: [WorkflowCommandWhereUniqueInput!]
-}
-
-input WorkflowCommandCreateManyWithoutBlacklistInput {
-  create: [WorkflowCommandCreateWithoutBlacklistInput!]
-  connect: [WorkflowCommandWhereUniqueInput!]
-}
-
-input WorkflowCommandCreateManyWithoutWhitelistInput {
-  create: [WorkflowCommandCreateWithoutWhitelistInput!]
-  connect: [WorkflowCommandWhereUniqueInput!]
-}
-
-input WorkflowCommandCreateWithoutBlacklistInput {
-  whitelist: RunnerCreateManyWithoutCommandWhitelistedInput
-  service: ServiceCreateOneInput!
-  command: CommandCreateOneInput!
-  parameters: WorkflowResultCreateOneInput!
-}
-
-input WorkflowCommandCreateWithoutWhitelistInput {
-  blacklist: RunnerCreateManyWithoutCommandBlacklistedInput
-  service: ServiceCreateOneInput!
-  command: CommandCreateOneInput!
-  parameters: WorkflowResultCreateOneInput!
-}
-
-type WorkflowCommandEdge {
-  node: WorkflowCommand!
-  cursor: String!
-}
-
-type WorkflowCommandExecutionConnection {
-  pageInfo: PageInfo!
-  edges: [WorkflowCommandExecutionEdge]!
-  aggregate: AggregateWorkflowCommandExecution!
-}
-
-input WorkflowCommandExecutionCreateInput {
-  duration: Int!
-  fee: Int!
-  results: WorkflowResultCreateManyInput
-}
-
-input WorkflowCommandExecutionCreateManyInput {
-  create: [WorkflowCommandExecutionCreateInput!]
-  connect: [WorkflowCommandExecutionWhereUniqueInput!]
-}
-
-type WorkflowCommandExecutionEdge {
-  node: WorkflowCommandExecution!
-  cursor: String!
-}
-
-enum WorkflowCommandExecutionOrderByInput {
-  id_ASC
-  id_DESC
-  duration_ASC
-  duration_DESC
-  fee_ASC
-  fee_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type WorkflowCommandExecutionPreviousValues {
-  id: ID!
-  duration: Int!
-  fee: Int!
-}
-
-type WorkflowCommandExecutionSubscriptionPayload {
-  mutation: MutationType!
-  node: WorkflowCommandExecution
-  updatedFields: [String!]
-  previousValues: WorkflowCommandExecutionPreviousValues
-}
-
-input WorkflowCommandExecutionSubscriptionWhereInput {
-  AND: [WorkflowCommandExecutionSubscriptionWhereInput!]
-  OR: [WorkflowCommandExecutionSubscriptionWhereInput!]
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: WorkflowCommandExecutionWhereInput
-}
-
-input WorkflowCommandExecutionUpdateInput {
-  duration: Int
-  fee: Int
-  results: WorkflowResultUpdateManyInput
-}
-
-input WorkflowCommandExecutionUpdateManyInput {
-  create: [WorkflowCommandExecutionCreateInput!]
-  connect: [WorkflowCommandExecutionWhereUniqueInput!]
-  disconnect: [WorkflowCommandExecutionWhereUniqueInput!]
-  delete: [WorkflowCommandExecutionWhereUniqueInput!]
-}
-
-input WorkflowCommandExecutionWhereInput {
-  AND: [WorkflowCommandExecutionWhereInput!]
-  OR: [WorkflowCommandExecutionWhereInput!]
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  duration: Int
-  duration_not: Int
-  duration_in: [Int!]
-  duration_not_in: [Int!]
-  duration_lt: Int
-  duration_lte: Int
-  duration_gt: Int
-  duration_gte: Int
-  fee: Int
-  fee_not: Int
-  fee_in: [Int!]
-  fee_not_in: [Int!]
-  fee_lt: Int
-  fee_lte: Int
-  fee_gt: Int
-  fee_gte: Int
-  results_every: WorkflowResultWhereInput
-  results_some: WorkflowResultWhereInput
-  results_none: WorkflowResultWhereInput
-}
-
-input WorkflowCommandExecutionWhereUniqueInput {
-  id: ID
-}
-
-enum WorkflowCommandOrderByInput {
-  id_ASC
-  id_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type WorkflowCommandPreviousValues {
-  id: ID!
-}
-
-type WorkflowCommandSubscriptionPayload {
-  mutation: MutationType!
-  node: WorkflowCommand
-  updatedFields: [String!]
-  previousValues: WorkflowCommandPreviousValues
-}
-
-input WorkflowCommandSubscriptionWhereInput {
-  AND: [WorkflowCommandSubscriptionWhereInput!]
-  OR: [WorkflowCommandSubscriptionWhereInput!]
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: WorkflowCommandWhereInput
-}
-
-input WorkflowCommandUpdateInput {
-  whitelist: RunnerUpdateManyWithoutCommandWhitelistedInput
-  blacklist: RunnerUpdateManyWithoutCommandBlacklistedInput
-  service: ServiceUpdateOneInput
-  command: CommandUpdateOneInput
-  parameters: WorkflowResultUpdateOneInput
-}
-
-input WorkflowCommandUpdateManyInput {
-  create: [WorkflowCommandCreateInput!]
-  connect: [WorkflowCommandWhereUniqueInput!]
-  disconnect: [WorkflowCommandWhereUniqueInput!]
-  delete: [WorkflowCommandWhereUniqueInput!]
-}
-
-input WorkflowCommandUpdateManyWithoutBlacklistInput {
-  create: [WorkflowCommandCreateWithoutBlacklistInput!]
-  connect: [WorkflowCommandWhereUniqueInput!]
-  disconnect: [WorkflowCommandWhereUniqueInput!]
-  delete: [WorkflowCommandWhereUniqueInput!]
-  update: [WorkflowCommandUpdateWithoutBlacklistInput!]
-  upsert: [WorkflowCommandUpsertWithoutBlacklistInput!]
-}
-
-input WorkflowCommandUpdateManyWithoutWhitelistInput {
-  create: [WorkflowCommandCreateWithoutWhitelistInput!]
-  connect: [WorkflowCommandWhereUniqueInput!]
-  disconnect: [WorkflowCommandWhereUniqueInput!]
-  delete: [WorkflowCommandWhereUniqueInput!]
-  update: [WorkflowCommandUpdateWithoutWhitelistInput!]
-  upsert: [WorkflowCommandUpsertWithoutWhitelistInput!]
-}
-
-input WorkflowCommandUpdateWithoutBlacklistDataInput {
-  whitelist: RunnerUpdateManyWithoutCommandWhitelistedInput
-  service: ServiceUpdateOneInput
-  command: CommandUpdateOneInput
-  parameters: WorkflowResultUpdateOneInput
-}
-
-input WorkflowCommandUpdateWithoutBlacklistInput {
-  where: WorkflowCommandWhereUniqueInput!
-  data: WorkflowCommandUpdateWithoutBlacklistDataInput!
-}
-
-input WorkflowCommandUpdateWithoutWhitelistDataInput {
-  blacklist: RunnerUpdateManyWithoutCommandBlacklistedInput
-  service: ServiceUpdateOneInput
-  command: CommandUpdateOneInput
-  parameters: WorkflowResultUpdateOneInput
-}
-
-input WorkflowCommandUpdateWithoutWhitelistInput {
-  where: WorkflowCommandWhereUniqueInput!
-  data: WorkflowCommandUpdateWithoutWhitelistDataInput!
-}
-
-input WorkflowCommandUpsertWithoutBlacklistInput {
-  where: WorkflowCommandWhereUniqueInput!
-  update: WorkflowCommandUpdateWithoutBlacklistDataInput!
-  create: WorkflowCommandCreateWithoutBlacklistInput!
-}
-
-input WorkflowCommandUpsertWithoutWhitelistInput {
-  where: WorkflowCommandWhereUniqueInput!
-  update: WorkflowCommandUpdateWithoutWhitelistDataInput!
-  create: WorkflowCommandCreateWithoutWhitelistInput!
-}
-
-input WorkflowCommandWhereInput {
-  AND: [WorkflowCommandWhereInput!]
-  OR: [WorkflowCommandWhereInput!]
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  whitelist_every: RunnerWhereInput
-  whitelist_some: RunnerWhereInput
-  whitelist_none: RunnerWhereInput
-  blacklist_every: RunnerWhereInput
-  blacklist_some: RunnerWhereInput
-  blacklist_none: RunnerWhereInput
-  service: ServiceWhereInput
-  command: CommandWhereInput
-  parameters: WorkflowResultWhereInput
-}
-
-input WorkflowCommandWhereUniqueInput {
-  id: ID
+  OBJECT
 }
 
 type WorkflowConnection {
@@ -1716,7 +1427,7 @@ input WorkflowCreateInput {
   title: String!
   description: String
   source: WorkflowSourceCreateOneInput!
-  commands: WorkflowCommandCreateManyInput
+  tasks: WorkflowTaskCreateManyInput
   executions: WorkflowExecutionCreateManyInput
 }
 
@@ -1734,7 +1445,7 @@ type WorkflowExecutionConnection {
 input WorkflowExecutionCreateInput {
   duration: Int!
   fee: Int!
-  commandExecutions: WorkflowCommandExecutionCreateManyInput
+  taskExecutions: WorkflowTaskExecutionCreateManyInput
 }
 
 input WorkflowExecutionCreateManyInput {
@@ -1786,7 +1497,7 @@ input WorkflowExecutionSubscriptionWhereInput {
 input WorkflowExecutionUpdateInput {
   duration: Int
   fee: Int
-  commandExecutions: WorkflowCommandExecutionUpdateManyInput
+  taskExecutions: WorkflowTaskExecutionUpdateManyInput
 }
 
 input WorkflowExecutionUpdateManyInput {
@@ -1829,9 +1540,9 @@ input WorkflowExecutionWhereInput {
   fee_lte: Int
   fee_gt: Int
   fee_gte: Int
-  commandExecutions_every: WorkflowCommandExecutionWhereInput
-  commandExecutions_some: WorkflowCommandExecutionWhereInput
-  commandExecutions_none: WorkflowCommandExecutionWhereInput
+  taskExecutions_every: WorkflowTaskExecutionWhereInput
+  taskExecutions_some: WorkflowTaskExecutionWhereInput
+  taskExecutions_none: WorkflowTaskExecutionWhereInput
 }
 
 input WorkflowExecutionWhereUniqueInput {
@@ -1871,11 +1582,6 @@ input WorkflowResultCreateInput {
 input WorkflowResultCreateManyInput {
   create: [WorkflowResultCreateInput!]
   connect: [WorkflowResultWhereUniqueInput!]
-}
-
-input WorkflowResultCreateOneInput {
-  create: WorkflowResultCreateInput
-  connect: WorkflowResultWhereUniqueInput
 }
 
 type WorkflowResultEdge {
@@ -1926,13 +1632,6 @@ input WorkflowResultUpdateManyInput {
   connect: [WorkflowResultWhereUniqueInput!]
   disconnect: [WorkflowResultWhereUniqueInput!]
   delete: [WorkflowResultWhereUniqueInput!]
-}
-
-input WorkflowResultUpdateOneInput {
-  create: WorkflowResultCreateInput
-  connect: WorkflowResultWhereUniqueInput
-  disconnect: WorkflowResultWhereUniqueInput
-  delete: WorkflowResultWhereUniqueInput
 }
 
 input WorkflowResultWhereInput {
@@ -2171,11 +1870,409 @@ input WorkflowSubscriptionWhereInput {
   node: WorkflowWhereInput
 }
 
+type WorkflowTaskConnection {
+  pageInfo: PageInfo!
+  edges: [WorkflowTaskEdge]!
+  aggregate: AggregateWorkflowTask!
+}
+
+input WorkflowTaskCreateInput {
+  whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
+  blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
+  service: ServiceCreateOneInput!
+  task: TaskCreateOneInput!
+  parameters: WorkflowResultCreateManyInput
+  parents: WorkflowTaskCreateManyWithoutParentsInput
+  children: WorkflowTaskCreateManyWithoutChildrenInput
+}
+
+input WorkflowTaskCreateManyInput {
+  create: [WorkflowTaskCreateInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+}
+
+input WorkflowTaskCreateManyWithoutBlacklistInput {
+  create: [WorkflowTaskCreateWithoutBlacklistInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+}
+
+input WorkflowTaskCreateManyWithoutChildrenInput {
+  create: [WorkflowTaskCreateWithoutChildrenInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+}
+
+input WorkflowTaskCreateManyWithoutParentsInput {
+  create: [WorkflowTaskCreateWithoutParentsInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+}
+
+input WorkflowTaskCreateManyWithoutWhitelistInput {
+  create: [WorkflowTaskCreateWithoutWhitelistInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+}
+
+input WorkflowTaskCreateWithoutBlacklistInput {
+  whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
+  service: ServiceCreateOneInput!
+  task: TaskCreateOneInput!
+  parameters: WorkflowResultCreateManyInput
+  parents: WorkflowTaskCreateManyWithoutParentsInput
+  children: WorkflowTaskCreateManyWithoutChildrenInput
+}
+
+input WorkflowTaskCreateWithoutChildrenInput {
+  whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
+  blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
+  service: ServiceCreateOneInput!
+  task: TaskCreateOneInput!
+  parameters: WorkflowResultCreateManyInput
+  parents: WorkflowTaskCreateManyWithoutParentsInput
+}
+
+input WorkflowTaskCreateWithoutParentsInput {
+  whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
+  blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
+  service: ServiceCreateOneInput!
+  task: TaskCreateOneInput!
+  parameters: WorkflowResultCreateManyInput
+  children: WorkflowTaskCreateManyWithoutChildrenInput
+}
+
+input WorkflowTaskCreateWithoutWhitelistInput {
+  blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
+  service: ServiceCreateOneInput!
+  task: TaskCreateOneInput!
+  parameters: WorkflowResultCreateManyInput
+  parents: WorkflowTaskCreateManyWithoutParentsInput
+  children: WorkflowTaskCreateManyWithoutChildrenInput
+}
+
+type WorkflowTaskEdge {
+  node: WorkflowTask!
+  cursor: String!
+}
+
+type WorkflowTaskExecutionConnection {
+  pageInfo: PageInfo!
+  edges: [WorkflowTaskExecutionEdge]!
+  aggregate: AggregateWorkflowTaskExecution!
+}
+
+input WorkflowTaskExecutionCreateInput {
+  duration: Int!
+  fee: Int!
+  results: WorkflowResultCreateManyInput
+}
+
+input WorkflowTaskExecutionCreateManyInput {
+  create: [WorkflowTaskExecutionCreateInput!]
+  connect: [WorkflowTaskExecutionWhereUniqueInput!]
+}
+
+type WorkflowTaskExecutionEdge {
+  node: WorkflowTaskExecution!
+  cursor: String!
+}
+
+enum WorkflowTaskExecutionOrderByInput {
+  id_ASC
+  id_DESC
+  duration_ASC
+  duration_DESC
+  fee_ASC
+  fee_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type WorkflowTaskExecutionPreviousValues {
+  id: ID!
+  duration: Int!
+  fee: Int!
+}
+
+type WorkflowTaskExecutionSubscriptionPayload {
+  mutation: MutationType!
+  node: WorkflowTaskExecution
+  updatedFields: [String!]
+  previousValues: WorkflowTaskExecutionPreviousValues
+}
+
+input WorkflowTaskExecutionSubscriptionWhereInput {
+  AND: [WorkflowTaskExecutionSubscriptionWhereInput!]
+  OR: [WorkflowTaskExecutionSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: WorkflowTaskExecutionWhereInput
+}
+
+input WorkflowTaskExecutionUpdateInput {
+  duration: Int
+  fee: Int
+  results: WorkflowResultUpdateManyInput
+}
+
+input WorkflowTaskExecutionUpdateManyInput {
+  create: [WorkflowTaskExecutionCreateInput!]
+  connect: [WorkflowTaskExecutionWhereUniqueInput!]
+  disconnect: [WorkflowTaskExecutionWhereUniqueInput!]
+  delete: [WorkflowTaskExecutionWhereUniqueInput!]
+}
+
+input WorkflowTaskExecutionWhereInput {
+  AND: [WorkflowTaskExecutionWhereInput!]
+  OR: [WorkflowTaskExecutionWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  duration: Int
+  duration_not: Int
+  duration_in: [Int!]
+  duration_not_in: [Int!]
+  duration_lt: Int
+  duration_lte: Int
+  duration_gt: Int
+  duration_gte: Int
+  fee: Int
+  fee_not: Int
+  fee_in: [Int!]
+  fee_not_in: [Int!]
+  fee_lt: Int
+  fee_lte: Int
+  fee_gt: Int
+  fee_gte: Int
+  results_every: WorkflowResultWhereInput
+  results_some: WorkflowResultWhereInput
+  results_none: WorkflowResultWhereInput
+}
+
+input WorkflowTaskExecutionWhereUniqueInput {
+  id: ID
+}
+
+enum WorkflowTaskOrderByInput {
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type WorkflowTaskPreviousValues {
+  id: ID!
+}
+
+type WorkflowTaskSubscriptionPayload {
+  mutation: MutationType!
+  node: WorkflowTask
+  updatedFields: [String!]
+  previousValues: WorkflowTaskPreviousValues
+}
+
+input WorkflowTaskSubscriptionWhereInput {
+  AND: [WorkflowTaskSubscriptionWhereInput!]
+  OR: [WorkflowTaskSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: WorkflowTaskWhereInput
+}
+
+input WorkflowTaskUpdateInput {
+  whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
+  blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
+  service: ServiceUpdateOneInput
+  task: TaskUpdateOneInput
+  parameters: WorkflowResultUpdateManyInput
+  parents: WorkflowTaskUpdateManyWithoutParentsInput
+  children: WorkflowTaskUpdateManyWithoutChildrenInput
+}
+
+input WorkflowTaskUpdateManyInput {
+  create: [WorkflowTaskCreateInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+  disconnect: [WorkflowTaskWhereUniqueInput!]
+  delete: [WorkflowTaskWhereUniqueInput!]
+}
+
+input WorkflowTaskUpdateManyWithoutBlacklistInput {
+  create: [WorkflowTaskCreateWithoutBlacklistInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+  disconnect: [WorkflowTaskWhereUniqueInput!]
+  delete: [WorkflowTaskWhereUniqueInput!]
+  update: [WorkflowTaskUpdateWithoutBlacklistInput!]
+  upsert: [WorkflowTaskUpsertWithoutBlacklistInput!]
+}
+
+input WorkflowTaskUpdateManyWithoutChildrenInput {
+  create: [WorkflowTaskCreateWithoutChildrenInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+  disconnect: [WorkflowTaskWhereUniqueInput!]
+  delete: [WorkflowTaskWhereUniqueInput!]
+  update: [WorkflowTaskUpdateWithoutChildrenInput!]
+  upsert: [WorkflowTaskUpsertWithoutChildrenInput!]
+}
+
+input WorkflowTaskUpdateManyWithoutParentsInput {
+  create: [WorkflowTaskCreateWithoutParentsInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+  disconnect: [WorkflowTaskWhereUniqueInput!]
+  delete: [WorkflowTaskWhereUniqueInput!]
+  update: [WorkflowTaskUpdateWithoutParentsInput!]
+  upsert: [WorkflowTaskUpsertWithoutParentsInput!]
+}
+
+input WorkflowTaskUpdateManyWithoutWhitelistInput {
+  create: [WorkflowTaskCreateWithoutWhitelistInput!]
+  connect: [WorkflowTaskWhereUniqueInput!]
+  disconnect: [WorkflowTaskWhereUniqueInput!]
+  delete: [WorkflowTaskWhereUniqueInput!]
+  update: [WorkflowTaskUpdateWithoutWhitelistInput!]
+  upsert: [WorkflowTaskUpsertWithoutWhitelistInput!]
+}
+
+input WorkflowTaskUpdateWithoutBlacklistDataInput {
+  whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
+  service: ServiceUpdateOneInput
+  task: TaskUpdateOneInput
+  parameters: WorkflowResultUpdateManyInput
+  parents: WorkflowTaskUpdateManyWithoutParentsInput
+  children: WorkflowTaskUpdateManyWithoutChildrenInput
+}
+
+input WorkflowTaskUpdateWithoutBlacklistInput {
+  where: WorkflowTaskWhereUniqueInput!
+  data: WorkflowTaskUpdateWithoutBlacklistDataInput!
+}
+
+input WorkflowTaskUpdateWithoutChildrenDataInput {
+  whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
+  blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
+  service: ServiceUpdateOneInput
+  task: TaskUpdateOneInput
+  parameters: WorkflowResultUpdateManyInput
+  parents: WorkflowTaskUpdateManyWithoutParentsInput
+}
+
+input WorkflowTaskUpdateWithoutChildrenInput {
+  where: WorkflowTaskWhereUniqueInput!
+  data: WorkflowTaskUpdateWithoutChildrenDataInput!
+}
+
+input WorkflowTaskUpdateWithoutParentsDataInput {
+  whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
+  blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
+  service: ServiceUpdateOneInput
+  task: TaskUpdateOneInput
+  parameters: WorkflowResultUpdateManyInput
+  children: WorkflowTaskUpdateManyWithoutChildrenInput
+}
+
+input WorkflowTaskUpdateWithoutParentsInput {
+  where: WorkflowTaskWhereUniqueInput!
+  data: WorkflowTaskUpdateWithoutParentsDataInput!
+}
+
+input WorkflowTaskUpdateWithoutWhitelistDataInput {
+  blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
+  service: ServiceUpdateOneInput
+  task: TaskUpdateOneInput
+  parameters: WorkflowResultUpdateManyInput
+  parents: WorkflowTaskUpdateManyWithoutParentsInput
+  children: WorkflowTaskUpdateManyWithoutChildrenInput
+}
+
+input WorkflowTaskUpdateWithoutWhitelistInput {
+  where: WorkflowTaskWhereUniqueInput!
+  data: WorkflowTaskUpdateWithoutWhitelistDataInput!
+}
+
+input WorkflowTaskUpsertWithoutBlacklistInput {
+  where: WorkflowTaskWhereUniqueInput!
+  update: WorkflowTaskUpdateWithoutBlacklistDataInput!
+  create: WorkflowTaskCreateWithoutBlacklistInput!
+}
+
+input WorkflowTaskUpsertWithoutChildrenInput {
+  where: WorkflowTaskWhereUniqueInput!
+  update: WorkflowTaskUpdateWithoutChildrenDataInput!
+  create: WorkflowTaskCreateWithoutChildrenInput!
+}
+
+input WorkflowTaskUpsertWithoutParentsInput {
+  where: WorkflowTaskWhereUniqueInput!
+  update: WorkflowTaskUpdateWithoutParentsDataInput!
+  create: WorkflowTaskCreateWithoutParentsInput!
+}
+
+input WorkflowTaskUpsertWithoutWhitelistInput {
+  where: WorkflowTaskWhereUniqueInput!
+  update: WorkflowTaskUpdateWithoutWhitelistDataInput!
+  create: WorkflowTaskCreateWithoutWhitelistInput!
+}
+
+input WorkflowTaskWhereInput {
+  AND: [WorkflowTaskWhereInput!]
+  OR: [WorkflowTaskWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  whitelist_every: RunnerWhereInput
+  whitelist_some: RunnerWhereInput
+  whitelist_none: RunnerWhereInput
+  blacklist_every: RunnerWhereInput
+  blacklist_some: RunnerWhereInput
+  blacklist_none: RunnerWhereInput
+  service: ServiceWhereInput
+  task: TaskWhereInput
+  parameters_every: WorkflowResultWhereInput
+  parameters_some: WorkflowResultWhereInput
+  parameters_none: WorkflowResultWhereInput
+  parents_every: WorkflowTaskWhereInput
+  parents_some: WorkflowTaskWhereInput
+  parents_none: WorkflowTaskWhereInput
+  children_every: WorkflowTaskWhereInput
+  children_some: WorkflowTaskWhereInput
+  children_none: WorkflowTaskWhereInput
+}
+
+input WorkflowTaskWhereUniqueInput {
+  id: ID
+}
+
 input WorkflowUpdateInput {
   title: String
   description: String
   source: WorkflowSourceUpdateOneInput
-  commands: WorkflowCommandUpdateManyInput
+  tasks: WorkflowTaskUpdateManyInput
   executions: WorkflowExecutionUpdateManyInput
 }
 
@@ -2225,9 +2322,9 @@ input WorkflowWhereInput {
   description_ends_with: String
   description_not_ends_with: String
   source: WorkflowSourceWhereInput
-  commands_every: WorkflowCommandWhereInput
-  commands_some: WorkflowCommandWhereInput
-  commands_none: WorkflowCommandWhereInput
+  tasks_every: WorkflowTaskWhereInput
+  tasks_some: WorkflowTaskWhereInput
+  tasks_none: WorkflowTaskWhereInput
   executions_every: WorkflowExecutionWhereInput
   executions_some: WorkflowExecutionWhereInput
   executions_none: WorkflowExecutionWhereInput

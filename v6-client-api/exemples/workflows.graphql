@@ -1,0 +1,40 @@
+fragment parameter on Parameter {
+  title
+  type
+}
+fragment filter on FilterDefinition {
+	parameter { ...parameter }
+  predicate
+  value  
+}
+
+{
+  workflows {
+    title
+    description
+    source {
+      service { title }
+      event {
+        title
+        data { ...parameter }
+      }
+      filters { ...filter }
+      whitelist { publicKey } 
+      blacklist  { publicKey }
+    }
+    tasks {
+      service { title }
+      task {
+        title
+        arguments { ...parameter }
+      }
+      parameters {
+        reference { ...parameter }
+        value
+      }
+
+      whitelist { publicKey } 
+      blacklist  { publicKey }    
+    }
+  }
+}

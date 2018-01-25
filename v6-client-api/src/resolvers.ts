@@ -18,7 +18,9 @@ export default {
       runner: 'runner',
       runners: 'runners',
       workflow: 'workflow',
-      workflows: 'workflows'
+      workflows: 'workflows',
+      service: 'service',
+      services: 'services',
     }, delegateQuery),
   },
   
@@ -27,7 +29,7 @@ export default {
       deployWorkflow: 'createWorkflow',
       disableWorkflow: 'deleteWorkflow',
       register: 'createRunner',
-      unregister: 'deleteRunner'
+      unregister: 'deleteRunner',
     }, delegateMutation),
   }
 }

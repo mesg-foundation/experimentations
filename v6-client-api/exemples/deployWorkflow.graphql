@@ -1,0 +1,50 @@
+# Ethereum transaction to webhook
+# source: Ethereum#onTransaction
+# tasks:
+#   - Webhook#send(url: "https://webhook.com", payload: "{ foo: 'bar' }")
+
+mutation {
+  deployWorkflow(data: {
+    title: "Super workflow",
+    description: "bla bla bla",
+    source: {
+      create: {
+        service: { connect: { id: "cjcu8eqkm000v0195l1ux6qrj" } }, # Ethereum
+        event: { connect: { id: "cjcu8eql2000w0195ntfax1wt" } }, # onTransaction
+        filters: {
+          create: [
+            {
+              parameter: { connect: { id: "cjcu8eql2000x0195ors10shg" } }, # Transaction Hash
+              predicate: EQ,
+              value: "0x134324r2482549824598425"
+            }
+          ]
+        },
+        whitelist: {
+          connect: [
+            { publicKey: "publickey#1" }
+          ]
+        }
+      }
+    },
+    tasks: {
+      create: [
+        {
+          service: { connect: { id: "cjcu8eqnx001j0195zfcxln0p" } }, # Webhook
+          task: { connect: { id: "cjcu8eqny001n0195rdjujapr" } }, # send
+       		parameters: {
+            create: [
+              {
+                reference: { connect: { id: "cjcu8eqny001o019549tkpxbn" } } # url
+                value: "https://webhook.com"
+              }, {
+                reference: { connect: { id: "cjcu8eqnz001p01959rdstly6" } }, # payload
+                value: "{ foo: 'bar' }"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }) { id }
+}

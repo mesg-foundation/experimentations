@@ -4,6 +4,7 @@ enum TYPE {
   STRING
   BOOLEAN
   DATE
+  OBJECT
 }
 
 enum PREDICATE {
@@ -42,8 +43,8 @@ type Runner {
   reliability: Float! @default(value: 100)
   sourceWhitelisted: [WorkflowSource!]! @relation(name: "SourceRunnerWhitelist")
   sourceBlacklisted: [WorkflowSource!]! @relation(name: "SourceRunnerBlacklist")
-  commandWhitelisted: [WorkflowCommand!]! @relation(name: "CommandRunnerWhitelist")
-  commandBlacklisted: [WorkflowCommand!]! @relation(name: "CommandRunnerBlacklist")
+  taskWhitelisted: [WorkflowTask!]! @relation(name: "TaskRunnerWhitelist")
+  taskBlacklisted: [WorkflowTask!]! @relation(name: "TaskRunnerBlacklist")
 }
 
 type Parameter implements Descriptable {
@@ -51,7 +52,7 @@ type Parameter implements Descriptable {
   title: String!
   description: String
   type: TYPE! @default(value: STRING)
-  required: Boolean!
+  required: Boolean @default(value: true)
 }
 
 type FilterDefinition {
@@ -68,7 +69,7 @@ type Event implements Descriptable {
   data: [Parameter!]!
 }
 
-type Command implements Descriptable {
+type Task implements Descriptable {
   id: ID! @unique
   title: String!
   description: String
@@ -80,7 +81,7 @@ type Service implements Descriptable {
   title: String!
   description: String
   events: [Event!]!
-  commands: [Command!]!
+  tasks: [Task!]!
 }
 
 type WorkflowConstant {
@@ -97,13 +98,15 @@ type WorkflowSource {
   filters: [FilterDefinition!]!
 }
 
-type WorkflowCommand {
+type WorkflowTask {
   id: ID! @unique
-  whitelist: [Runner!]! @relation(name: "CommandRunnerWhitelist")
-  blacklist: [Runner!]! @relation(name: "CommandRunnerBlacklist")
+  whitelist: [Runner!]! @relation(name: "TaskRunnerWhitelist")
+  blacklist: [Runner!]! @relation(name: "TaskRunnerBlacklist")
   service: Service!
-  command: Command!
-  parameters: WorkflowResult!
+  task: Task!
+  parameters: [WorkflowResult!]!
+  parents: [WorkflowTask!]! @relation(name: "ParentWorkflowTasks")
+  children: [WorkflowTask!]! @relation(name: "ChildrenWorkflowTasks")
 }
 
 type WorkflowResult {
@@ -117,7 +120,7 @@ type Workflow implements Descriptable {
   title: String!
   description: String
   source: WorkflowSource!
-  commands: [WorkflowCommand!]!
+  tasks: [WorkflowTask!]!
 
   executions: [WorkflowExecution!]!
 }
@@ -126,10 +129,10 @@ type WorkflowExecution implements Monitorable {
   id: ID! @unique
   duration: Int!
   fee: Int!
-  commandExecutions: [WorkflowCommandExecution!]!
+  taskExecutions: [WorkflowTaskExecution!]!
 }
 
-type WorkflowCommandExecution implements Monitorable {
+type WorkflowTaskExecution implements Monitorable {
   id: ID! @unique
   duration: Int!
   fee: Int!

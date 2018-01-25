@@ -6,6 +6,9 @@ type Query {
 
   workflow(where: WorkflowWhereUniqueInput!): Workflow
   workflows(where: WorkflowWhereInput, orderBy: WorkflowOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Workflow]!
+
+  service(where: ServiceWhereUniqueInput!): Service
+  services(where: ServiceWhereInput, orderBy: ServiceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Service]!
 }
 
 type Mutation {
@@ -14,4 +17,6 @@ type Mutation {
 
   register(data: RunnerCreateInput!): Runner!
   unregister(where: RunnerWhereUniqueInput!): Runner
+
+  createService(data: ServiceCreateInput!): Service!
 }
