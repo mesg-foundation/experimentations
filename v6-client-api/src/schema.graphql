@@ -1,0 +1,10 @@
+# import Post from "./generated/prisma.graphql"
+
+type Query {
+  workflow(id: ID!): Workflow
+  allWorkflows: [Workflow!]!
+}
+
+type Mutation {
+  createWorkflow(data: WorkflowCreateInput!): Workflow
+}

@@ -1,0 +1,137 @@
+enum TYPE {
+  FLOAT
+  INTEGER
+  STRING
+  BOOLEAN
+  DATE
+}
+
+enum PREDICATE {
+  EQ
+  NEQ
+  GT
+  GTEQ
+  LT
+  LTEQ
+  MATCHES
+  DOES_NOT_MATCH
+  START
+  NOT_START
+  END
+  NOT_END
+  IN
+  NOT_IN
+  CONT
+  NOT_CONT
+}
+
+interface Descriptable {
+  title: String!
+  description: String
+}
+
+interface Monitorable {
+  duration: Int!
+  fee: Int!
+}
+
+type Runner {
+  id: ID! @unique
+  publicKey: String! @unique
+  stake: Float! @default(value: 0)
+  reliability: Float! @default(value: 100)
+  sourceWhitelisted: [WorkflowSource!]! @relation(name: "SourceRunnerWhitelist")
+  sourceBlacklisted: [WorkflowSource!]! @relation(name: "SourceRunnerBlacklist")
+  commandWhitelisted: [WorkflowCommand!]! @relation(name: "CommandRunnerWhitelist")
+  commandBlacklisted: [WorkflowCommand!]! @relation(name: "CommandRunnerBlacklist")
+}
+
+type Parameter implements Descriptable {
+  id: ID! @unique
+  title: String!
+  description: String
+  type: TYPE! @default(value: STRING)
+  required: Boolean!
+}
+
+type FilterDefinition {
+  id: ID! @unique
+  parameter: Parameter!
+  predicate: PREDICATE! @default(value: EQ)
+  value: String!
+}
+
+type Event implements Descriptable {
+  id: ID! @unique
+  title: String!
+  description: String
+  data: [Parameter!]!
+}
+
+type Command implements Descriptable {
+  id: ID! @unique
+  title: String!
+  description: String
+  arguments: [Parameter!]!
+}
+
+type Service implements Descriptable {
+  id: ID! @unique
+  title: String!
+  description: String
+  events: [Event!]!
+  commands: [Command!]!
+}
+
+type WorkflowConstant {
+  id: ID! @unique
+  value: String!
+}
+
+type WorkflowSource {
+  id: ID! @unique
+  whitelist: [Runner!]! @relation(name: "SourceRunnerWhitelist")
+  blacklist: [Runner!]! @relation(name: "SourceRunnerBlacklist")
+  service: Service!
+  event: Event!
+  filters: [FilterDefinition!]!
+}
+
+type WorkflowCommand {
+  id: ID! @unique
+  whitelist: [Runner!]! @relation(name: "CommandRunnerWhitelist")
+  blacklist: [Runner!]! @relation(name: "CommandRunnerBlacklist")
+  service: Service!
+  command: Command!
+  parameters: WorkflowResult!
+}
+
+type WorkflowResult {
+  id: ID! @unique
+  reference: Parameter!
+  value: String!
+}
+
+type Workflow implements Descriptable {
+  id: ID! @unique
+  title: String!
+  description: String
+  source: WorkflowSource!
+  commands: [WorkflowCommand!]!
+
+  executions: [WorkflowExecution!]!
+}
+
+type WorkflowExecution implements Monitorable {
+  id: ID! @unique
+  duration: Int!
+  fee: Int!
+  commandExecutions: [WorkflowCommandExecution!]!
+}
+
+type WorkflowCommandExecution implements Monitorable {
+  id: ID! @unique
+  duration: Int!
+  fee: Int!
+  results: [WorkflowResult!]!
+}
