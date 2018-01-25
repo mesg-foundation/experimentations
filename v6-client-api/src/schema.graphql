@@ -1,10 +1,17 @@
 # import Post from "./generated/prisma.graphql"
 
 type Query {
-  workflow(id: ID!): Workflow
-  allWorkflows: [Workflow!]!
+  runner(where: RunnerWhereUniqueInput!): Runner
+  runners(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner]!
+
+  workflow(where: WorkflowWhereUniqueInput!): Workflow
+  workflows(where: WorkflowWhereInput, orderBy: WorkflowOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Workflow]!
 }
 
 type Mutation {
-  createWorkflow(data: WorkflowCreateInput!): Workflow
+  deployWorkflow(data: WorkflowCreateInput!): Workflow!
+  disableWorkflow(where: WorkflowWhereUniqueInput!): Workflow
+
+  register(data: RunnerCreateInput!): Runner!
+  unregister(where: RunnerWhereUniqueInput!): Runner
 }
