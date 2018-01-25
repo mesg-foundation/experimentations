@@ -93,7 +93,6 @@ type WorkflowSource {
   id: ID! @unique
   whitelist: [Runner!]! @relation(name: "SourceRunnerWhitelist")
   blacklist: [Runner!]! @relation(name: "SourceRunnerBlacklist")
-  service: Service!
   event: Event!
   filters: [FilterDefinition!]!
 }
@@ -102,7 +101,6 @@ type WorkflowTask {
   id: ID! @unique
   whitelist: [Runner!]! @relation(name: "TaskRunnerWhitelist")
   blacklist: [Runner!]! @relation(name: "TaskRunnerBlacklist")
-  service: Service!
   task: Task!
   parameters: [WorkflowResult!]!
   parents: [WorkflowTask!]! @relation(name: "ParentWorkflowTasks")

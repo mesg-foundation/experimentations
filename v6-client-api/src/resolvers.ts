@@ -30,6 +30,7 @@ export default {
       disableWorkflow: 'deleteWorkflow',
       register: 'createRunner',
       unregister: 'deleteRunner',
+      createService: 'createService',
     }, delegateMutation),
   }
 }

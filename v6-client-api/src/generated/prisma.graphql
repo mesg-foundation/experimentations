@@ -84,7 +84,6 @@ type WorkflowSource implements Node {
   id: ID!
   whitelist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
   blacklist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
-  service(where: ServiceWhereInput): Service!
   event(where: EventWhereInput): Event!
   filters(where: FilterDefinitionWhereInput, orderBy: FilterDefinitionOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [FilterDefinition!]
 }
@@ -93,7 +92,6 @@ type WorkflowTask implements Node {
   id: ID!
   whitelist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
   blacklist(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner!]
-  service(where: ServiceWhereInput): Service!
   task(where: TaskWhereInput): Task!
   parameters(where: WorkflowResultWhereInput, orderBy: WorkflowResultOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowResult!]
   parents(where: WorkflowTaskWhereInput, orderBy: WorkflowTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WorkflowTask!]
@@ -1049,11 +1047,6 @@ input ServiceCreateInput {
   tasks: TaskCreateManyInput
 }
 
-input ServiceCreateOneInput {
-  create: ServiceCreateInput
-  connect: ServiceWhereUniqueInput
-}
-
 type ServiceEdge {
   node: Service!
   cursor: String!
@@ -1100,13 +1093,6 @@ input ServiceUpdateInput {
   description: String
   events: EventUpdateManyInput
   tasks: TaskUpdateManyInput
-}
-
-input ServiceUpdateOneInput {
-  create: ServiceCreateInput
-  connect: ServiceWhereUniqueInput
-  disconnect: ServiceWhereUniqueInput
-  delete: ServiceWhereUniqueInput
 }
 
 input ServiceWhereInput {
@@ -1681,7 +1667,6 @@ type WorkflowSourceConnection {
 input WorkflowSourceCreateInput {
   whitelist: RunnerCreateManyWithoutSourceWhitelistedInput
   blacklist: RunnerCreateManyWithoutSourceBlacklistedInput
-  service: ServiceCreateOneInput!
   event: EventCreateOneInput!
   filters: FilterDefinitionCreateManyInput
 }
@@ -1703,14 +1688,12 @@ input WorkflowSourceCreateOneInput {
 
 input WorkflowSourceCreateWithoutBlacklistInput {
   whitelist: RunnerCreateManyWithoutSourceWhitelistedInput
-  service: ServiceCreateOneInput!
   event: EventCreateOneInput!
   filters: FilterDefinitionCreateManyInput
 }
 
 input WorkflowSourceCreateWithoutWhitelistInput {
   blacklist: RunnerCreateManyWithoutSourceBlacklistedInput
-  service: ServiceCreateOneInput!
   event: EventCreateOneInput!
   filters: FilterDefinitionCreateManyInput
 }
@@ -1753,7 +1736,6 @@ input WorkflowSourceSubscriptionWhereInput {
 input WorkflowSourceUpdateInput {
   whitelist: RunnerUpdateManyWithoutSourceWhitelistedInput
   blacklist: RunnerUpdateManyWithoutSourceBlacklistedInput
-  service: ServiceUpdateOneInput
   event: EventUpdateOneInput
   filters: FilterDefinitionUpdateManyInput
 }
@@ -1785,7 +1767,6 @@ input WorkflowSourceUpdateOneInput {
 
 input WorkflowSourceUpdateWithoutBlacklistDataInput {
   whitelist: RunnerUpdateManyWithoutSourceWhitelistedInput
-  service: ServiceUpdateOneInput
   event: EventUpdateOneInput
   filters: FilterDefinitionUpdateManyInput
 }
@@ -1797,7 +1778,6 @@ input WorkflowSourceUpdateWithoutBlacklistInput {
 
 input WorkflowSourceUpdateWithoutWhitelistDataInput {
   blacklist: RunnerUpdateManyWithoutSourceBlacklistedInput
-  service: ServiceUpdateOneInput
   event: EventUpdateOneInput
   filters: FilterDefinitionUpdateManyInput
 }
@@ -1842,7 +1822,6 @@ input WorkflowSourceWhereInput {
   blacklist_every: RunnerWhereInput
   blacklist_some: RunnerWhereInput
   blacklist_none: RunnerWhereInput
-  service: ServiceWhereInput
   event: EventWhereInput
   filters_every: FilterDefinitionWhereInput
   filters_some: FilterDefinitionWhereInput
@@ -1879,7 +1858,6 @@ type WorkflowTaskConnection {
 input WorkflowTaskCreateInput {
   whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
   blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
-  service: ServiceCreateOneInput!
   task: TaskCreateOneInput!
   parameters: WorkflowResultCreateManyInput
   parents: WorkflowTaskCreateManyWithoutParentsInput
@@ -1913,7 +1891,6 @@ input WorkflowTaskCreateManyWithoutWhitelistInput {
 
 input WorkflowTaskCreateWithoutBlacklistInput {
   whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
-  service: ServiceCreateOneInput!
   task: TaskCreateOneInput!
   parameters: WorkflowResultCreateManyInput
   parents: WorkflowTaskCreateManyWithoutParentsInput
@@ -1923,7 +1900,6 @@ input WorkflowTaskCreateWithoutBlacklistInput {
 input WorkflowTaskCreateWithoutChildrenInput {
   whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
   blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
-  service: ServiceCreateOneInput!
   task: TaskCreateOneInput!
   parameters: WorkflowResultCreateManyInput
   parents: WorkflowTaskCreateManyWithoutParentsInput
@@ -1932,7 +1908,6 @@ input WorkflowTaskCreateWithoutChildrenInput {
 input WorkflowTaskCreateWithoutParentsInput {
   whitelist: RunnerCreateManyWithoutTaskWhitelistedInput
   blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
-  service: ServiceCreateOneInput!
   task: TaskCreateOneInput!
   parameters: WorkflowResultCreateManyInput
   children: WorkflowTaskCreateManyWithoutChildrenInput
@@ -1940,7 +1915,6 @@ input WorkflowTaskCreateWithoutParentsInput {
 
 input WorkflowTaskCreateWithoutWhitelistInput {
   blacklist: RunnerCreateManyWithoutTaskBlacklistedInput
-  service: ServiceCreateOneInput!
   task: TaskCreateOneInput!
   parameters: WorkflowResultCreateManyInput
   parents: WorkflowTaskCreateManyWithoutParentsInput
@@ -2098,7 +2072,6 @@ input WorkflowTaskSubscriptionWhereInput {
 input WorkflowTaskUpdateInput {
   whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
   blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
-  service: ServiceUpdateOneInput
   task: TaskUpdateOneInput
   parameters: WorkflowResultUpdateManyInput
   parents: WorkflowTaskUpdateManyWithoutParentsInput
@@ -2150,7 +2123,6 @@ input WorkflowTaskUpdateManyWithoutWhitelistInput {
 
 input WorkflowTaskUpdateWithoutBlacklistDataInput {
   whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
-  service: ServiceUpdateOneInput
   task: TaskUpdateOneInput
   parameters: WorkflowResultUpdateManyInput
   parents: WorkflowTaskUpdateManyWithoutParentsInput
@@ -2165,7 +2137,6 @@ input WorkflowTaskUpdateWithoutBlacklistInput {
 input WorkflowTaskUpdateWithoutChildrenDataInput {
   whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
   blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
-  service: ServiceUpdateOneInput
   task: TaskUpdateOneInput
   parameters: WorkflowResultUpdateManyInput
   parents: WorkflowTaskUpdateManyWithoutParentsInput
@@ -2179,7 +2150,6 @@ input WorkflowTaskUpdateWithoutChildrenInput {
 input WorkflowTaskUpdateWithoutParentsDataInput {
   whitelist: RunnerUpdateManyWithoutTaskWhitelistedInput
   blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
-  service: ServiceUpdateOneInput
   task: TaskUpdateOneInput
   parameters: WorkflowResultUpdateManyInput
   children: WorkflowTaskUpdateManyWithoutChildrenInput
@@ -2192,7 +2162,6 @@ input WorkflowTaskUpdateWithoutParentsInput {
 
 input WorkflowTaskUpdateWithoutWhitelistDataInput {
   blacklist: RunnerUpdateManyWithoutTaskBlacklistedInput
-  service: ServiceUpdateOneInput
   task: TaskUpdateOneInput
   parameters: WorkflowResultUpdateManyInput
   parents: WorkflowTaskUpdateManyWithoutParentsInput
@@ -2251,7 +2220,6 @@ input WorkflowTaskWhereInput {
   blacklist_every: RunnerWhereInput
   blacklist_some: RunnerWhereInput
   blacklist_none: RunnerWhereInput
-  service: ServiceWhereInput
   task: TaskWhereInput
   parameters_every: WorkflowResultWhereInput
   parameters_some: WorkflowResultWhereInput
