@@ -10,6 +10,7 @@ type Event implements Node {
   title: String!
   description: String
   data(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Parameter!]
+  service(where: ServiceWhereInput): Service!
 }
 
 type FilterDefinition implements Node {
@@ -51,6 +52,7 @@ type Task implements Node {
   title: String!
   description: String
   arguments(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Parameter!]
+  service(where: ServiceWhereInput): Service!
 }
 
 type Workflow implements Node {
@@ -176,16 +178,23 @@ input EventCreateInput {
   title: String!
   description: String
   data: ParameterCreateManyInput
+  service: ServiceCreateOneWithoutEventsInput!
 }
 
-input EventCreateManyInput {
-  create: [EventCreateInput!]
+input EventCreateManyWithoutServiceInput {
+  create: [EventCreateWithoutServiceInput!]
   connect: [EventWhereUniqueInput!]
 }
 
 input EventCreateOneInput {
   create: EventCreateInput
   connect: EventWhereUniqueInput
+}
+
+input EventCreateWithoutServiceInput {
+  title: String!
+  description: String
+  data: ParameterCreateManyInput
 }
 
 type EventEdge {
@@ -233,13 +242,16 @@ input EventUpdateInput {
   title: String
   description: String
   data: ParameterUpdateManyInput
+  service: ServiceUpdateOneWithoutEventsInput
 }
 
-input EventUpdateManyInput {
-  create: [EventCreateInput!]
+input EventUpdateManyWithoutServiceInput {
+  create: [EventCreateWithoutServiceInput!]
   connect: [EventWhereUniqueInput!]
   disconnect: [EventWhereUniqueInput!]
   delete: [EventWhereUniqueInput!]
+  update: [EventUpdateWithoutServiceInput!]
+  upsert: [EventUpsertWithoutServiceInput!]
 }
 
 input EventUpdateOneInput {
@@ -247,6 +259,23 @@ input EventUpdateOneInput {
   connect: EventWhereUniqueInput
   disconnect: EventWhereUniqueInput
   delete: EventWhereUniqueInput
+}
+
+input EventUpdateWithoutServiceDataInput {
+  title: String
+  description: String
+  data: ParameterUpdateManyInput
+}
+
+input EventUpdateWithoutServiceInput {
+  where: EventWhereUniqueInput!
+  data: EventUpdateWithoutServiceDataInput!
+}
+
+input EventUpsertWithoutServiceInput {
+  where: EventWhereUniqueInput!
+  update: EventUpdateWithoutServiceDataInput!
+  create: EventCreateWithoutServiceInput!
 }
 
 input EventWhereInput {
@@ -297,6 +326,7 @@ input EventWhereInput {
   data_every: ParameterWhereInput
   data_some: ParameterWhereInput
   data_none: ParameterWhereInput
+  service: ServiceWhereInput
 }
 
 input EventWhereUniqueInput {
@@ -1043,8 +1073,30 @@ type ServiceConnection {
 input ServiceCreateInput {
   title: String!
   description: String
-  events: EventCreateManyInput
-  tasks: TaskCreateManyInput
+  events: EventCreateManyWithoutServiceInput
+  tasks: TaskCreateManyWithoutServiceInput
+}
+
+input ServiceCreateOneWithoutEventsInput {
+  create: ServiceCreateWithoutEventsInput
+  connect: ServiceWhereUniqueInput
+}
+
+input ServiceCreateOneWithoutTasksInput {
+  create: ServiceCreateWithoutTasksInput
+  connect: ServiceWhereUniqueInput
+}
+
+input ServiceCreateWithoutEventsInput {
+  title: String!
+  description: String
+  tasks: TaskCreateManyWithoutServiceInput
+}
+
+input ServiceCreateWithoutTasksInput {
+  title: String!
+  description: String
+  events: EventCreateManyWithoutServiceInput
 }
 
 type ServiceEdge {
@@ -1091,8 +1143,60 @@ input ServiceSubscriptionWhereInput {
 input ServiceUpdateInput {
   title: String
   description: String
-  events: EventUpdateManyInput
-  tasks: TaskUpdateManyInput
+  events: EventUpdateManyWithoutServiceInput
+  tasks: TaskUpdateManyWithoutServiceInput
+}
+
+input ServiceUpdateOneWithoutEventsInput {
+  create: ServiceCreateWithoutEventsInput
+  connect: ServiceWhereUniqueInput
+  disconnect: ServiceWhereUniqueInput
+  delete: ServiceWhereUniqueInput
+  update: ServiceUpdateWithoutEventsInput
+  upsert: ServiceUpsertWithoutEventsInput
+}
+
+input ServiceUpdateOneWithoutTasksInput {
+  create: ServiceCreateWithoutTasksInput
+  connect: ServiceWhereUniqueInput
+  disconnect: ServiceWhereUniqueInput
+  delete: ServiceWhereUniqueInput
+  update: ServiceUpdateWithoutTasksInput
+  upsert: ServiceUpsertWithoutTasksInput
+}
+
+input ServiceUpdateWithoutEventsDataInput {
+  title: String
+  description: String
+  tasks: TaskUpdateManyWithoutServiceInput
+}
+
+input ServiceUpdateWithoutEventsInput {
+  where: ServiceWhereUniqueInput!
+  data: ServiceUpdateWithoutEventsDataInput!
+}
+
+input ServiceUpdateWithoutTasksDataInput {
+  title: String
+  description: String
+  events: EventUpdateManyWithoutServiceInput
+}
+
+input ServiceUpdateWithoutTasksInput {
+  where: ServiceWhereUniqueInput!
+  data: ServiceUpdateWithoutTasksDataInput!
+}
+
+input ServiceUpsertWithoutEventsInput {
+  where: ServiceWhereUniqueInput!
+  update: ServiceUpdateWithoutEventsDataInput!
+  create: ServiceCreateWithoutEventsInput!
+}
+
+input ServiceUpsertWithoutTasksInput {
+  where: ServiceWhereUniqueInput!
+  update: ServiceUpdateWithoutTasksDataInput!
+  create: ServiceCreateWithoutTasksInput!
 }
 
 input ServiceWhereInput {
@@ -1178,16 +1282,23 @@ input TaskCreateInput {
   title: String!
   description: String
   arguments: ParameterCreateManyInput
+  service: ServiceCreateOneWithoutTasksInput!
 }
 
-input TaskCreateManyInput {
-  create: [TaskCreateInput!]
+input TaskCreateManyWithoutServiceInput {
+  create: [TaskCreateWithoutServiceInput!]
   connect: [TaskWhereUniqueInput!]
 }
 
 input TaskCreateOneInput {
   create: TaskCreateInput
   connect: TaskWhereUniqueInput
+}
+
+input TaskCreateWithoutServiceInput {
+  title: String!
+  description: String
+  arguments: ParameterCreateManyInput
 }
 
 type TaskEdge {
@@ -1235,13 +1346,16 @@ input TaskUpdateInput {
   title: String
   description: String
   arguments: ParameterUpdateManyInput
+  service: ServiceUpdateOneWithoutTasksInput
 }
 
-input TaskUpdateManyInput {
-  create: [TaskCreateInput!]
+input TaskUpdateManyWithoutServiceInput {
+  create: [TaskCreateWithoutServiceInput!]
   connect: [TaskWhereUniqueInput!]
   disconnect: [TaskWhereUniqueInput!]
   delete: [TaskWhereUniqueInput!]
+  update: [TaskUpdateWithoutServiceInput!]
+  upsert: [TaskUpsertWithoutServiceInput!]
 }
 
 input TaskUpdateOneInput {
@@ -1249,6 +1363,23 @@ input TaskUpdateOneInput {
   connect: TaskWhereUniqueInput
   disconnect: TaskWhereUniqueInput
   delete: TaskWhereUniqueInput
+}
+
+input TaskUpdateWithoutServiceDataInput {
+  title: String
+  description: String
+  arguments: ParameterUpdateManyInput
+}
+
+input TaskUpdateWithoutServiceInput {
+  where: TaskWhereUniqueInput!
+  data: TaskUpdateWithoutServiceDataInput!
+}
+
+input TaskUpsertWithoutServiceInput {
+  where: TaskWhereUniqueInput!
+  update: TaskUpdateWithoutServiceDataInput!
+  create: TaskCreateWithoutServiceInput!
 }
 
 input TaskWhereInput {
@@ -1299,6 +1430,7 @@ input TaskWhereInput {
   arguments_every: ParameterWhereInput
   arguments_some: ParameterWhereInput
   arguments_none: ParameterWhereInput
+  service: ServiceWhereInput
 }
 
 input TaskWhereUniqueInput {

@@ -67,6 +67,7 @@ type Event implements Descriptable {
   title: String!
   description: String
   data: [Parameter!]!
+  service: Service!
 }
 
 type Task implements Descriptable {
@@ -74,6 +75,7 @@ type Task implements Descriptable {
   title: String!
   description: String
   arguments: [Parameter!]!
+  service: Service!
 }
 
 type Service implements Descriptable {

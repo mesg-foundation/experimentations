@@ -8,13 +8,13 @@ fragment filter on FilterDefinition {
   value  
 }
 
-{
+query allWorkflows {
   workflows {
     title
     description
     source {
-      service { title }
       event {
+        service { title }
         title
         data { ...parameter }
       }
@@ -23,8 +23,8 @@ fragment filter on FilterDefinition {
       blacklist  { publicKey }
     }
     tasks {
-      service { title }
       task {
+        service { title }
         title
         arguments { ...parameter }
       }

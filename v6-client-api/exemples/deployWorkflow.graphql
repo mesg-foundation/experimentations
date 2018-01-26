@@ -3,20 +3,32 @@
 # tasks:
 #   - Webhook#send(url: "https://webhook.com", payload: "{ foo: 'bar' }")
 
-mutation {
+# Find a complete workflow on https://www.graphqlbin.com/2kvghk
+
+mutation(
+  $sourceId: ID!,
+  $filter1: ID!,
+  $filter2: ID!,
+  $taskId: ID!,
+  $urlArg: ID!,
+  $payloadArg: ID!
+) {
   deployWorkflow(data: {
     title: "Super workflow",
     description: "bla bla bla",
     source: {
       create: {
-        service: { connect: { id: "cjcu8eqkm000v0195l1ux6qrj" } }, # Ethereum
-        event: { connect: { id: "cjcu8eql2000w0195ntfax1wt" } }, # onTransaction
+        event: { connect: { id: $sourceId } }, # Ethereum#onTransaction
         filters: {
           create: [
             {
-              parameter: { connect: { id: "cjcu8eql2000x0195ors10shg" } }, # Transaction Hash
+              parameter: { connect: { id: $filter1 } }, # Transaction Hash
               predicate: EQ,
               value: "0x134324r2482549824598425"
+            }, {
+              parameter: { connect: { id: $filter2 } }, # Fees
+              predicate: GTEQ,
+              value: "45000"
             }
           ]
         },
@@ -30,15 +42,14 @@ mutation {
     tasks: {
       create: [
         {
-          service: { connect: { id: "cjcu8eqnx001j0195zfcxln0p" } }, # Webhook
-          task: { connect: { id: "cjcu8eqny001n0195rdjujapr" } }, # send
+          task: { connect: { id: $taskId } }, # Webhook#send
        		parameters: {
             create: [
               {
-                reference: { connect: { id: "cjcu8eqny001o019549tkpxbn" } } # url
+                reference: { connect: { id: $urlArg } } # url
                 value: "https://webhook.com"
               }, {
-                reference: { connect: { id: "cjcu8eqnz001p01959rdstly6" } }, # payload
+                reference: { connect: { id: $payloadArg } }, # payload
                 value: "{ foo: 'bar' }"
               }
             ]

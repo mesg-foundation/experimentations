@@ -14,6 +14,7 @@ type Event implements Node {
   title: String!
   description: String
   data(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Parameter!]
+  service(where: ServiceWhereInput): Service!
 }
 
 type FilterDefinition implements Node {
@@ -55,6 +56,7 @@ type Task implements Node {
   title: String!
   description: String
   arguments(where: ParameterWhereInput, orderBy: ParameterOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Parameter!]
+  service(where: ServiceWhereInput): Service!
 }
 
 type Workflow implements Node {
@@ -180,16 +182,23 @@ input EventCreateInput {
   title: String!
   description: String
   data: ParameterCreateManyInput
+  service: ServiceCreateOneWithoutEventsInput!
 }
 
-input EventCreateManyInput {
-  create: [EventCreateInput!]
+input EventCreateManyWithoutServiceInput {
+  create: [EventCreateWithoutServiceInput!]
   connect: [EventWhereUniqueInput!]
 }
 
 input EventCreateOneInput {
   create: EventCreateInput
   connect: EventWhereUniqueInput
+}
+
+input EventCreateWithoutServiceInput {
+  title: String!
+  description: String
+  data: ParameterCreateManyInput
 }
 
 type EventEdge {
@@ -237,13 +246,16 @@ input EventUpdateInput {
   title: String
   description: String
   data: ParameterUpdateManyInput
+  service: ServiceUpdateOneWithoutEventsInput
 }
 
-input EventUpdateManyInput {
-  create: [EventCreateInput!]
+input EventUpdateManyWithoutServiceInput {
+  create: [EventCreateWithoutServiceInput!]
   connect: [EventWhereUniqueInput!]
   disconnect: [EventWhereUniqueInput!]
   delete: [EventWhereUniqueInput!]
+  update: [EventUpdateWithoutServiceInput!]
+  upsert: [EventUpsertWithoutServiceInput!]
 }
 
 input EventUpdateOneInput {
@@ -251,6 +263,23 @@ input EventUpdateOneInput {
   connect: EventWhereUniqueInput
   disconnect: EventWhereUniqueInput
   delete: EventWhereUniqueInput
+}
+
+input EventUpdateWithoutServiceDataInput {
+  title: String
+  description: String
+  data: ParameterUpdateManyInput
+}
+
+input EventUpdateWithoutServiceInput {
+  where: EventWhereUniqueInput!
+  data: EventUpdateWithoutServiceDataInput!
+}
+
+input EventUpsertWithoutServiceInput {
+  where: EventWhereUniqueInput!
+  update: EventUpdateWithoutServiceDataInput!
+  create: EventCreateWithoutServiceInput!
 }
 
 input EventWhereInput {
@@ -301,6 +330,7 @@ input EventWhereInput {
   data_every: ParameterWhereInput
   data_some: ParameterWhereInput
   data_none: ParameterWhereInput
+  service: ServiceWhereInput
 }
 
 input EventWhereUniqueInput {
@@ -1047,8 +1077,30 @@ type ServiceConnection {
 input ServiceCreateInput {
   title: String!
   description: String
-  events: EventCreateManyInput
-  tasks: TaskCreateManyInput
+  events: EventCreateManyWithoutServiceInput
+  tasks: TaskCreateManyWithoutServiceInput
+}
+
+input ServiceCreateOneWithoutEventsInput {
+  create: ServiceCreateWithoutEventsInput
+  connect: ServiceWhereUniqueInput
+}
+
+input ServiceCreateOneWithoutTasksInput {
+  create: ServiceCreateWithoutTasksInput
+  connect: ServiceWhereUniqueInput
+}
+
+input ServiceCreateWithoutEventsInput {
+  title: String!
+  description: String
+  tasks: TaskCreateManyWithoutServiceInput
+}
+
+input ServiceCreateWithoutTasksInput {
+  title: String!
+  description: String
+  events: EventCreateManyWithoutServiceInput
 }
 
 type ServiceEdge {
@@ -1095,8 +1147,60 @@ input ServiceSubscriptionWhereInput {
 input ServiceUpdateInput {
   title: String
   description: String
-  events: EventUpdateManyInput
-  tasks: TaskUpdateManyInput
+  events: EventUpdateManyWithoutServiceInput
+  tasks: TaskUpdateManyWithoutServiceInput
+}
+
+input ServiceUpdateOneWithoutEventsInput {
+  create: ServiceCreateWithoutEventsInput
+  connect: ServiceWhereUniqueInput
+  disconnect: ServiceWhereUniqueInput
+  delete: ServiceWhereUniqueInput
+  update: ServiceUpdateWithoutEventsInput
+  upsert: ServiceUpsertWithoutEventsInput
+}
+
+input ServiceUpdateOneWithoutTasksInput {
+  create: ServiceCreateWithoutTasksInput
+  connect: ServiceWhereUniqueInput
+  disconnect: ServiceWhereUniqueInput
+  delete: ServiceWhereUniqueInput
+  update: ServiceUpdateWithoutTasksInput
+  upsert: ServiceUpsertWithoutTasksInput
+}
+
+input ServiceUpdateWithoutEventsDataInput {
+  title: String
+  description: String
+  tasks: TaskUpdateManyWithoutServiceInput
+}
+
+input ServiceUpdateWithoutEventsInput {
+  where: ServiceWhereUniqueInput!
+  data: ServiceUpdateWithoutEventsDataInput!
+}
+
+input ServiceUpdateWithoutTasksDataInput {
+  title: String
+  description: String
+  events: EventUpdateManyWithoutServiceInput
+}
+
+input ServiceUpdateWithoutTasksInput {
+  where: ServiceWhereUniqueInput!
+  data: ServiceUpdateWithoutTasksDataInput!
+}
+
+input ServiceUpsertWithoutEventsInput {
+  where: ServiceWhereUniqueInput!
+  update: ServiceUpdateWithoutEventsDataInput!
+  create: ServiceCreateWithoutEventsInput!
+}
+
+input ServiceUpsertWithoutTasksInput {
+  where: ServiceWhereUniqueInput!
+  update: ServiceUpdateWithoutTasksDataInput!
+  create: ServiceCreateWithoutTasksInput!
 }
 
 input ServiceWhereInput {
@@ -1182,16 +1286,23 @@ input TaskCreateInput {
   title: String!
   description: String
   arguments: ParameterCreateManyInput
+  service: ServiceCreateOneWithoutTasksInput!
 }
 
-input TaskCreateManyInput {
-  create: [TaskCreateInput!]
+input TaskCreateManyWithoutServiceInput {
+  create: [TaskCreateWithoutServiceInput!]
   connect: [TaskWhereUniqueInput!]
 }
 
 input TaskCreateOneInput {
   create: TaskCreateInput
   connect: TaskWhereUniqueInput
+}
+
+input TaskCreateWithoutServiceInput {
+  title: String!
+  description: String
+  arguments: ParameterCreateManyInput
 }
 
 type TaskEdge {
@@ -1239,13 +1350,16 @@ input TaskUpdateInput {
   title: String
   description: String
   arguments: ParameterUpdateManyInput
+  service: ServiceUpdateOneWithoutTasksInput
 }
 
-input TaskUpdateManyInput {
-  create: [TaskCreateInput!]
+input TaskUpdateManyWithoutServiceInput {
+  create: [TaskCreateWithoutServiceInput!]
   connect: [TaskWhereUniqueInput!]
   disconnect: [TaskWhereUniqueInput!]
   delete: [TaskWhereUniqueInput!]
+  update: [TaskUpdateWithoutServiceInput!]
+  upsert: [TaskUpsertWithoutServiceInput!]
 }
 
 input TaskUpdateOneInput {
@@ -1253,6 +1367,23 @@ input TaskUpdateOneInput {
   connect: TaskWhereUniqueInput
   disconnect: TaskWhereUniqueInput
   delete: TaskWhereUniqueInput
+}
+
+input TaskUpdateWithoutServiceDataInput {
+  title: String
+  description: String
+  arguments: ParameterUpdateManyInput
+}
+
+input TaskUpdateWithoutServiceInput {
+  where: TaskWhereUniqueInput!
+  data: TaskUpdateWithoutServiceDataInput!
+}
+
+input TaskUpsertWithoutServiceInput {
+  where: TaskWhereUniqueInput!
+  update: TaskUpdateWithoutServiceDataInput!
+  create: TaskCreateWithoutServiceInput!
 }
 
 input TaskWhereInput {
@@ -1303,6 +1434,7 @@ input TaskWhereInput {
   arguments_every: ParameterWhereInput
   arguments_some: ParameterWhereInput
   arguments_none: ParameterWhereInput
+  service: ServiceWhereInput
 }
 
 input TaskWhereUniqueInput {
@@ -2307,13 +2439,11 @@ input WorkflowWhereUniqueInput {
 }
 `
 
-export type TaskOrderByInput = 
+export type WorkflowResultOrderByInput = 
   'id_ASC' |
   'id_DESC' |
-  'title_ASC' |
-  'title_DESC' |
-  'description_ASC' |
-  'description_DESC' |
+  'value_ASC' |
+  'value_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
   'createdAt_ASC' |
@@ -2322,6 +2452,50 @@ export type TaskOrderByInput =
 export type WorkflowSourceOrderByInput = 
   'id_ASC' |
   'id_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type WorkflowTaskOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type WorkflowTaskExecutionOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'duration_ASC' |
+  'duration_DESC' |
+  'fee_ASC' |
+  'fee_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type FilterDefinitionOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'predicate_ASC' |
+  'predicate_DESC' |
+  'value_ASC' |
+  'value_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type WorkflowOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'title_ASC' |
+  'title_DESC' |
+  'description_ASC' |
+  'description_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
   'createdAt_ASC' |
@@ -2344,52 +2518,6 @@ export type PREDICATE =
   'NOT_IN' |
   'CONT' |
   'NOT_CONT'
-
-export type WorkflowTaskExecutionOrderByInput = 
-  'id_ASC' |
-  'id_DESC' |
-  'duration_ASC' |
-  'duration_DESC' |
-  'fee_ASC' |
-  'fee_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
-
-export type EventOrderByInput = 
-  'id_ASC' |
-  'id_DESC' |
-  'title_ASC' |
-  'title_DESC' |
-  'description_ASC' |
-  'description_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
-
-export type WorkflowOrderByInput = 
-  'id_ASC' |
-  'id_DESC' |
-  'title_ASC' |
-  'title_DESC' |
-  'description_ASC' |
-  'description_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
-
-export type WorkflowResultOrderByInput = 
-  'id_ASC' |
-  'id_DESC' |
-  'value_ASC' |
-  'value_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
 
 export type TYPE = 
   'FLOAT' |
@@ -2415,18 +2543,6 @@ export type ParameterOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
-export type FilterDefinitionOrderByInput = 
-  'id_ASC' |
-  'id_DESC' |
-  'predicate_ASC' |
-  'predicate_DESC' |
-  'value_ASC' |
-  'value_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
-
 export type RunnerOrderByInput = 
   'id_ASC' |
   'id_DESC' |
@@ -2441,9 +2557,25 @@ export type RunnerOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
-export type WorkflowTaskOrderByInput = 
+export type EventOrderByInput = 
   'id_ASC' |
   'id_DESC' |
+  'title_ASC' |
+  'title_DESC' |
+  'description_ASC' |
+  'description_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
+export type TaskOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'title_ASC' |
+  'title_DESC' |
+  'description_ASC' |
+  'description_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
   'createdAt_ASC' |
@@ -2488,9 +2620,9 @@ export type MutationType =
   'UPDATED' |
   'DELETED'
 
-export interface WorkflowTaskCreateManyWithoutChildrenInput {
-  create?: WorkflowTaskCreateWithoutChildrenInput[] | WorkflowTaskCreateWithoutChildrenInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+export interface TaskCreateManyWithoutServiceInput {
+  create?: TaskCreateWithoutServiceInput[] | TaskCreateWithoutServiceInput
+  connect?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
 }
 
 export interface RunnerWhereInput {
@@ -2554,35 +2686,35 @@ export interface RunnerWhereInput {
   taskBlacklisted_none?: WorkflowTaskWhereInput
 }
 
-export interface WorkflowTaskUpdateWithoutParentsDataInput {
-  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
-  blacklist?: RunnerUpdateManyWithoutTaskBlacklistedInput
-  task?: TaskUpdateOneInput
-  parameters?: WorkflowResultUpdateManyInput
-  children?: WorkflowTaskUpdateManyWithoutChildrenInput
+export interface WorkflowSourceCreateWithoutWhitelistInput {
+  blacklist?: RunnerCreateManyWithoutSourceBlacklistedInput
+  event: EventCreateOneInput
+  filters?: FilterDefinitionCreateManyInput
 }
 
-export interface WorkflowTaskUpdateWithoutBlacklistInput {
+export interface WorkflowTaskUpsertWithoutChildrenInput {
   where: WorkflowTaskWhereUniqueInput
-  data: WorkflowTaskUpdateWithoutBlacklistDataInput
+  update: WorkflowTaskUpdateWithoutChildrenDataInput
+  create: WorkflowTaskCreateWithoutChildrenInput
 }
 
-export interface WorkflowTaskUpdateWithoutParentsInput {
-  where: WorkflowTaskWhereUniqueInput
-  data: WorkflowTaskUpdateWithoutParentsDataInput
+export interface RunnerCreateManyWithoutSourceBlacklistedInput {
+  create?: RunnerCreateWithoutSourceBlacklistedInput[] | RunnerCreateWithoutSourceBlacklistedInput
+  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
 }
 
-export interface WorkflowConstantCreateInput {
-  value: String
+export interface WorkflowSourceCreateOneInput {
+  create?: WorkflowSourceCreateInput
+  connect?: WorkflowSourceWhereUniqueInput
 }
 
-export interface WorkflowTaskUpdateManyWithoutParentsInput {
-  create?: WorkflowTaskCreateWithoutParentsInput[] | WorkflowTaskCreateWithoutParentsInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  update?: WorkflowTaskUpdateWithoutParentsInput[] | WorkflowTaskUpdateWithoutParentsInput
-  upsert?: WorkflowTaskUpsertWithoutParentsInput[] | WorkflowTaskUpsertWithoutParentsInput
+export interface RunnerCreateWithoutSourceBlacklistedInput {
+  publicKey: String
+  stake?: Float
+  reliability?: Float
+  sourceWhitelisted?: WorkflowSourceCreateManyWithoutWhitelistInput
+  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
+  taskBlacklisted?: WorkflowTaskCreateManyWithoutBlacklistInput
 }
 
 export interface WorkflowExecutionSubscriptionWhereInput {
@@ -2595,11 +2727,9 @@ export interface WorkflowExecutionSubscriptionWhereInput {
   node?: WorkflowExecutionWhereInput
 }
 
-export interface WorkflowResultUpdateManyInput {
-  create?: WorkflowResultCreateInput[] | WorkflowResultCreateInput
-  connect?: WorkflowResultWhereUniqueInput[] | WorkflowResultWhereUniqueInput
-  disconnect?: WorkflowResultWhereUniqueInput[] | WorkflowResultWhereUniqueInput
-  delete?: WorkflowResultWhereUniqueInput[] | WorkflowResultWhereUniqueInput
+export interface WorkflowTaskCreateManyWithoutWhitelistInput {
+  create?: WorkflowTaskCreateWithoutWhitelistInput[] | WorkflowTaskCreateWithoutWhitelistInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
 }
 
 export interface WorkflowResultSubscriptionWhereInput {
@@ -2612,11 +2742,12 @@ export interface WorkflowResultSubscriptionWhereInput {
   node?: WorkflowResultWhereInput
 }
 
-export interface TaskUpdateOneInput {
-  create?: TaskCreateInput
-  connect?: TaskWhereUniqueInput
-  disconnect?: TaskWhereUniqueInput
-  delete?: TaskWhereUniqueInput
+export interface WorkflowTaskCreateWithoutWhitelistInput {
+  blacklist?: RunnerCreateManyWithoutTaskBlacklistedInput
+  task: TaskCreateOneInput
+  parameters?: WorkflowResultCreateManyInput
+  parents?: WorkflowTaskCreateManyWithoutParentsInput
+  children?: WorkflowTaskCreateManyWithoutChildrenInput
 }
 
 export interface WorkflowResultWhereInput {
@@ -2653,10 +2784,28 @@ export interface WorkflowResultWhereInput {
   reference?: ParameterWhereInput
 }
 
-export interface RunnerUpsertWithoutTaskWhitelistedInput {
-  where: RunnerWhereUniqueInput
-  update: RunnerUpdateWithoutTaskWhitelistedDataInput
-  create: RunnerCreateWithoutTaskWhitelistedInput
+export interface RunnerCreateManyWithoutTaskBlacklistedInput {
+  create?: RunnerCreateWithoutTaskBlacklistedInput[] | RunnerCreateWithoutTaskBlacklistedInput
+  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
+}
+
+export interface WorkflowSourceSubscriptionWhereInput {
+  AND?: WorkflowSourceSubscriptionWhereInput[] | WorkflowSourceSubscriptionWhereInput
+  OR?: WorkflowSourceSubscriptionWhereInput[] | WorkflowSourceSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: WorkflowSourceWhereInput
+}
+
+export interface RunnerCreateWithoutTaskBlacklistedInput {
+  publicKey: String
+  stake?: Float
+  reliability?: Float
+  sourceWhitelisted?: WorkflowSourceCreateManyWithoutWhitelistInput
+  sourceBlacklisted?: WorkflowSourceCreateManyWithoutBlacklistInput
+  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
 }
 
 export interface WorkflowConstantSubscriptionWhereInput {
@@ -2669,13 +2818,9 @@ export interface WorkflowConstantSubscriptionWhereInput {
   node?: WorkflowConstantWhereInput
 }
 
-export interface RunnerUpdateWithoutTaskWhitelistedDataInput {
-  publicKey?: String
-  stake?: Float
-  reliability?: Float
-  sourceWhitelisted?: WorkflowSourceUpdateManyWithoutWhitelistInput
-  sourceBlacklisted?: WorkflowSourceUpdateManyWithoutBlacklistInput
-  taskBlacklisted?: WorkflowTaskUpdateManyWithoutBlacklistInput
+export interface WorkflowSourceCreateManyWithoutBlacklistInput {
+  create?: WorkflowSourceCreateWithoutBlacklistInput[] | WorkflowSourceCreateWithoutBlacklistInput
+  connect?: WorkflowSourceWhereUniqueInput[] | WorkflowSourceWhereUniqueInput
 }
 
 export interface ServiceSubscriptionWhereInput {
@@ -2688,57 +2833,10 @@ export interface ServiceSubscriptionWhereInput {
   node?: ServiceWhereInput
 }
 
-export interface RunnerUpdateWithoutTaskWhitelistedInput {
-  where: RunnerWhereUniqueInput
-  data: RunnerUpdateWithoutTaskWhitelistedDataInput
-}
-
-export interface FilterDefinitionWhereInput {
-  AND?: FilterDefinitionWhereInput[] | FilterDefinitionWhereInput
-  OR?: FilterDefinitionWhereInput[] | FilterDefinitionWhereInput
-  id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  predicate?: PREDICATE
-  predicate_not?: PREDICATE
-  predicate_in?: PREDICATE[] | PREDICATE
-  predicate_not_in?: PREDICATE[] | PREDICATE
-  value?: String
-  value_not?: String
-  value_in?: String[] | String
-  value_not_in?: String[] | String
-  value_lt?: String
-  value_lte?: String
-  value_gt?: String
-  value_gte?: String
-  value_contains?: String
-  value_not_contains?: String
-  value_starts_with?: String
-  value_not_starts_with?: String
-  value_ends_with?: String
-  value_not_ends_with?: String
-  parameter?: ParameterWhereInput
-}
-
-export interface RunnerCreateInput {
-  publicKey: String
-  stake?: Float
-  reliability?: Float
-  sourceWhitelisted?: WorkflowSourceCreateManyWithoutWhitelistInput
-  sourceBlacklisted?: WorkflowSourceCreateManyWithoutBlacklistInput
-  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
-  taskBlacklisted?: WorkflowTaskCreateManyWithoutBlacklistInput
+export interface WorkflowSourceCreateWithoutBlacklistInput {
+  whitelist?: RunnerCreateManyWithoutSourceWhitelistedInput
+  event: EventCreateOneInput
+  filters?: FilterDefinitionCreateManyInput
 }
 
 export interface TaskSubscriptionWhereInput {
@@ -2751,9 +2849,9 @@ export interface TaskSubscriptionWhereInput {
   node?: TaskWhereInput
 }
 
-export interface WorkflowSourceCreateManyWithoutWhitelistInput {
-  create?: WorkflowSourceCreateWithoutWhitelistInput[] | WorkflowSourceCreateWithoutWhitelistInput
-  connect?: WorkflowSourceWhereUniqueInput[] | WorkflowSourceWhereUniqueInput
+export interface RunnerCreateManyWithoutSourceWhitelistedInput {
+  create?: RunnerCreateWithoutSourceWhitelistedInput[] | RunnerCreateWithoutSourceWhitelistedInput
+  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
 }
 
 export interface WorkflowConstantWhereInput {
@@ -2789,10 +2887,13 @@ export interface WorkflowConstantWhereInput {
   value_not_ends_with?: String
 }
 
-export interface WorkflowSourceCreateWithoutWhitelistInput {
-  blacklist?: RunnerCreateManyWithoutSourceBlacklistedInput
-  event: EventCreateOneInput
-  filters?: FilterDefinitionCreateManyInput
+export interface RunnerCreateWithoutSourceWhitelistedInput {
+  publicKey: String
+  stake?: Float
+  reliability?: Float
+  sourceBlacklisted?: WorkflowSourceCreateManyWithoutBlacklistInput
+  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
+  taskBlacklisted?: WorkflowTaskCreateManyWithoutBlacklistInput
 }
 
 export interface FilterDefinitionSubscriptionWhereInput {
@@ -2805,9 +2906,9 @@ export interface FilterDefinitionSubscriptionWhereInput {
   node?: FilterDefinitionWhereInput
 }
 
-export interface RunnerCreateManyWithoutSourceBlacklistedInput {
-  create?: RunnerCreateWithoutSourceBlacklistedInput[] | RunnerCreateWithoutSourceBlacklistedInput
-  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
+export interface WorkflowTaskCreateManyWithoutBlacklistInput {
+  create?: WorkflowTaskCreateWithoutBlacklistInput[] | WorkflowTaskCreateWithoutBlacklistInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
 }
 
 export interface WorkflowExecutionWhereInput {
@@ -2848,13 +2949,12 @@ export interface WorkflowExecutionWhereInput {
   taskExecutions_none?: WorkflowTaskExecutionWhereInput
 }
 
-export interface RunnerCreateWithoutSourceBlacklistedInput {
-  publicKey: String
-  stake?: Float
-  reliability?: Float
-  sourceWhitelisted?: WorkflowSourceCreateManyWithoutWhitelistInput
-  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
-  taskBlacklisted?: WorkflowTaskCreateManyWithoutBlacklistInput
+export interface WorkflowTaskCreateWithoutBlacklistInput {
+  whitelist?: RunnerCreateManyWithoutTaskWhitelistedInput
+  task: TaskCreateOneInput
+  parameters?: WorkflowResultCreateManyInput
+  parents?: WorkflowTaskCreateManyWithoutParentsInput
+  children?: WorkflowTaskCreateManyWithoutChildrenInput
 }
 
 export interface EventWhereInput {
@@ -2905,11 +3005,12 @@ export interface EventWhereInput {
   data_every?: ParameterWhereInput
   data_some?: ParameterWhereInput
   data_none?: ParameterWhereInput
+  service?: ServiceWhereInput
 }
 
-export interface WorkflowTaskCreateManyWithoutWhitelistInput {
-  create?: WorkflowTaskCreateWithoutWhitelistInput[] | WorkflowTaskCreateWithoutWhitelistInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+export interface RunnerCreateManyWithoutTaskWhitelistedInput {
+  create?: RunnerCreateWithoutTaskWhitelistedInput[] | RunnerCreateWithoutTaskWhitelistedInput
+  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
 }
 
 export interface WorkflowSourceWhereInput {
@@ -2941,120 +3042,6 @@ export interface WorkflowSourceWhereInput {
   filters_none?: FilterDefinitionWhereInput
 }
 
-export interface WorkflowTaskCreateWithoutWhitelistInput {
-  blacklist?: RunnerCreateManyWithoutTaskBlacklistedInput
-  task: TaskCreateOneInput
-  parameters?: WorkflowResultCreateManyInput
-  parents?: WorkflowTaskCreateManyWithoutParentsInput
-  children?: WorkflowTaskCreateManyWithoutChildrenInput
-}
-
-export interface WorkflowTaskExecutionUpdateInput {
-  duration?: Int
-  fee?: Int
-  results?: WorkflowResultUpdateManyInput
-}
-
-export interface RunnerCreateManyWithoutTaskBlacklistedInput {
-  create?: RunnerCreateWithoutTaskBlacklistedInput[] | RunnerCreateWithoutTaskBlacklistedInput
-  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
-}
-
-export interface RunnerWhereUniqueInput {
-  id?: ID_Input
-  publicKey?: String
-}
-
-export interface RunnerCreateWithoutTaskBlacklistedInput {
-  publicKey: String
-  stake?: Float
-  reliability?: Float
-  sourceWhitelisted?: WorkflowSourceCreateManyWithoutWhitelistInput
-  sourceBlacklisted?: WorkflowSourceCreateManyWithoutBlacklistInput
-  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
-}
-
-export interface FilterDefinitionWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface WorkflowSourceCreateManyWithoutBlacklistInput {
-  create?: WorkflowSourceCreateWithoutBlacklistInput[] | WorkflowSourceCreateWithoutBlacklistInput
-  connect?: WorkflowSourceWhereUniqueInput[] | WorkflowSourceWhereUniqueInput
-}
-
-export interface TaskWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface WorkflowSourceCreateWithoutBlacklistInput {
-  whitelist?: RunnerCreateManyWithoutSourceWhitelistedInput
-  event: EventCreateOneInput
-  filters?: FilterDefinitionCreateManyInput
-}
-
-export interface WorkflowConstantWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface RunnerCreateManyWithoutSourceWhitelistedInput {
-  create?: RunnerCreateWithoutSourceWhitelistedInput[] | RunnerCreateWithoutSourceWhitelistedInput
-  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
-}
-
-export interface WorkflowTaskWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface RunnerCreateWithoutSourceWhitelistedInput {
-  publicKey: String
-  stake?: Float
-  reliability?: Float
-  sourceBlacklisted?: WorkflowSourceCreateManyWithoutBlacklistInput
-  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
-  taskBlacklisted?: WorkflowTaskCreateManyWithoutBlacklistInput
-}
-
-export interface WorkflowWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface WorkflowTaskCreateManyWithoutBlacklistInput {
-  create?: WorkflowTaskCreateWithoutBlacklistInput[] | WorkflowTaskCreateWithoutBlacklistInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-}
-
-export interface WorkflowTaskExecutionWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface WorkflowTaskCreateWithoutBlacklistInput {
-  whitelist?: RunnerCreateManyWithoutTaskWhitelistedInput
-  task: TaskCreateOneInput
-  parameters?: WorkflowResultCreateManyInput
-  parents?: WorkflowTaskCreateManyWithoutParentsInput
-  children?: WorkflowTaskCreateManyWithoutChildrenInput
-}
-
-export interface WorkflowExecutionUpdateManyInput {
-  create?: WorkflowExecutionCreateInput[] | WorkflowExecutionCreateInput
-  connect?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
-  disconnect?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
-  delete?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
-}
-
-export interface RunnerCreateManyWithoutTaskWhitelistedInput {
-  create?: RunnerCreateWithoutTaskWhitelistedInput[] | RunnerCreateWithoutTaskWhitelistedInput
-  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
-}
-
-export interface WorkflowSourceUpdateOneInput {
-  create?: WorkflowSourceCreateInput
-  connect?: WorkflowSourceWhereUniqueInput
-  disconnect?: WorkflowSourceWhereUniqueInput
-  delete?: WorkflowSourceWhereUniqueInput
-}
-
 export interface RunnerCreateWithoutTaskWhitelistedInput {
   publicKey: String
   stake?: Float
@@ -3064,9 +3051,10 @@ export interface RunnerCreateWithoutTaskWhitelistedInput {
   taskBlacklisted?: WorkflowTaskCreateManyWithoutBlacklistInput
 }
 
-export interface WorkflowResultUpdateInput {
-  value?: String
-  reference?: ParameterUpdateOneInput
+export interface WorkflowTaskExecutionUpdateInput {
+  duration?: Int
+  fee?: Int
+  results?: WorkflowResultUpdateManyInput
 }
 
 export interface TaskCreateOneInput {
@@ -3074,24 +3062,20 @@ export interface TaskCreateOneInput {
   connect?: TaskWhereUniqueInput
 }
 
-export interface WorkflowSourceUpdateInput {
-  whitelist?: RunnerUpdateManyWithoutSourceWhitelistedInput
-  blacklist?: RunnerUpdateManyWithoutSourceBlacklistedInput
-  event?: EventUpdateOneInput
-  filters?: FilterDefinitionUpdateManyInput
+export interface RunnerWhereUniqueInput {
+  id?: ID_Input
+  publicKey?: String
 }
 
 export interface TaskCreateInput {
   title: String
   description?: String
   arguments?: ParameterCreateManyInput
+  service: ServiceCreateOneWithoutTasksInput
 }
 
-export interface TaskUpdateManyInput {
-  create?: TaskCreateInput[] | TaskCreateInput
-  connect?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
-  disconnect?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
-  delete?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
+export interface FilterDefinitionWhereUniqueInput {
+  id?: ID_Input
 }
 
 export interface ParameterCreateManyInput {
@@ -3099,11 +3083,8 @@ export interface ParameterCreateManyInput {
   connect?: ParameterWhereUniqueInput[] | ParameterWhereUniqueInput
 }
 
-export interface ServiceUpdateInput {
-  title?: String
-  description?: String
-  events?: EventUpdateManyInput
-  tasks?: TaskUpdateManyInput
+export interface TaskWhereUniqueInput {
+  id?: ID_Input
 }
 
 export interface ParameterCreateInput {
@@ -3113,11 +3094,49 @@ export interface ParameterCreateInput {
   required?: Boolean
 }
 
-export interface ParameterUpdateManyInput {
-  create?: ParameterCreateInput[] | ParameterCreateInput
-  connect?: ParameterWhereUniqueInput[] | ParameterWhereUniqueInput
-  disconnect?: ParameterWhereUniqueInput[] | ParameterWhereUniqueInput
-  delete?: ParameterWhereUniqueInput[] | ParameterWhereUniqueInput
+export interface WorkflowConstantWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface ServiceCreateOneWithoutTasksInput {
+  create?: ServiceCreateWithoutTasksInput
+  connect?: ServiceWhereUniqueInput
+}
+
+export interface WorkflowTaskWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface ServiceCreateWithoutTasksInput {
+  title: String
+  description?: String
+  events?: EventCreateManyWithoutServiceInput
+}
+
+export interface WorkflowWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface EventCreateManyWithoutServiceInput {
+  create?: EventCreateWithoutServiceInput[] | EventCreateWithoutServiceInput
+  connect?: EventWhereUniqueInput[] | EventWhereUniqueInput
+}
+
+export interface WorkflowTaskExecutionWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface EventCreateWithoutServiceInput {
+  title: String
+  description?: String
+  data?: ParameterCreateManyInput
+}
+
+export interface WorkflowExecutionUpdateManyInput {
+  create?: WorkflowExecutionCreateInput[] | WorkflowExecutionCreateInput
+  connect?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
+  disconnect?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
+  delete?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
 }
 
 export interface WorkflowResultCreateManyInput {
@@ -3125,11 +3144,11 @@ export interface WorkflowResultCreateManyInput {
   connect?: WorkflowResultWhereUniqueInput[] | WorkflowResultWhereUniqueInput
 }
 
-export interface ParameterUpdateOneInput {
-  create?: ParameterCreateInput
-  connect?: ParameterWhereUniqueInput
-  disconnect?: ParameterWhereUniqueInput
-  delete?: ParameterWhereUniqueInput
+export interface WorkflowSourceUpdateOneInput {
+  create?: WorkflowSourceCreateInput
+  connect?: WorkflowSourceWhereUniqueInput
+  disconnect?: WorkflowSourceWhereUniqueInput
+  delete?: WorkflowSourceWhereUniqueInput
 }
 
 export interface WorkflowResultCreateInput {
@@ -3137,11 +3156,9 @@ export interface WorkflowResultCreateInput {
   reference: ParameterCreateOneInput
 }
 
-export interface ParameterUpdateInput {
-  title?: String
-  description?: String
-  type?: TYPE
-  required?: Boolean
+export interface WorkflowResultUpdateInput {
+  value?: String
+  reference?: ParameterUpdateOneInput
 }
 
 export interface ParameterCreateOneInput {
@@ -3149,10 +3166,11 @@ export interface ParameterCreateOneInput {
   connect?: ParameterWhereUniqueInput
 }
 
-export interface RunnerUpsertWithoutSourceBlacklistedInput {
-  where: RunnerWhereUniqueInput
-  update: RunnerUpdateWithoutSourceBlacklistedDataInput
-  create: RunnerCreateWithoutSourceBlacklistedInput
+export interface WorkflowSourceUpdateInput {
+  whitelist?: RunnerUpdateManyWithoutSourceWhitelistedInput
+  blacklist?: RunnerUpdateManyWithoutSourceBlacklistedInput
+  event?: EventUpdateOneInput
+  filters?: FilterDefinitionUpdateManyInput
 }
 
 export interface WorkflowTaskCreateManyWithoutParentsInput {
@@ -3160,10 +3178,11 @@ export interface WorkflowTaskCreateManyWithoutParentsInput {
   connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
 }
 
-export interface RunnerUpsertWithoutTaskBlacklistedInput {
-  where: RunnerWhereUniqueInput
-  update: RunnerUpdateWithoutTaskBlacklistedDataInput
-  create: RunnerCreateWithoutTaskBlacklistedInput
+export interface ServiceUpdateInput {
+  title?: String
+  description?: String
+  events?: EventUpdateManyWithoutServiceInput
+  tasks?: TaskUpdateManyWithoutServiceInput
 }
 
 export interface WorkflowTaskCreateWithoutParentsInput {
@@ -3174,26 +3193,20 @@ export interface WorkflowTaskCreateWithoutParentsInput {
   children?: WorkflowTaskCreateManyWithoutChildrenInput
 }
 
-export interface FilterDefinitionUpdateManyInput {
-  create?: FilterDefinitionCreateInput[] | FilterDefinitionCreateInput
-  connect?: FilterDefinitionWhereUniqueInput[] | FilterDefinitionWhereUniqueInput
-  disconnect?: FilterDefinitionWhereUniqueInput[] | FilterDefinitionWhereUniqueInput
-  delete?: FilterDefinitionWhereUniqueInput[] | FilterDefinitionWhereUniqueInput
+export interface EventUpsertWithoutServiceInput {
+  where: EventWhereUniqueInput
+  update: EventUpdateWithoutServiceDataInput
+  create: EventCreateWithoutServiceInput
 }
 
-export interface RunnerUpdateManyWithoutTaskWhitelistedInput {
-  create?: RunnerCreateWithoutTaskWhitelistedInput[] | RunnerCreateWithoutTaskWhitelistedInput
-  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
-  disconnect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
-  delete?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
-  update?: RunnerUpdateWithoutTaskWhitelistedInput[] | RunnerUpdateWithoutTaskWhitelistedInput
-  upsert?: RunnerUpsertWithoutTaskWhitelistedInput[] | RunnerUpsertWithoutTaskWhitelistedInput
+export interface WorkflowTaskCreateManyWithoutChildrenInput {
+  create?: WorkflowTaskCreateWithoutChildrenInput[] | WorkflowTaskCreateWithoutChildrenInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
 }
 
-export interface RunnerUpsertWithoutSourceWhitelistedInput {
-  where: RunnerWhereUniqueInput
-  update: RunnerUpdateWithoutSourceWhitelistedDataInput
-  create: RunnerCreateWithoutSourceWhitelistedInput
+export interface EventUpdateWithoutServiceInput {
+  where: EventWhereUniqueInput
+  data: EventUpdateWithoutServiceDataInput
 }
 
 export interface WorkflowTaskCreateWithoutChildrenInput {
@@ -3204,10 +3217,10 @@ export interface WorkflowTaskCreateWithoutChildrenInput {
   parents?: WorkflowTaskCreateManyWithoutParentsInput
 }
 
-export interface WorkflowTaskUpsertWithoutParentsInput {
-  where: WorkflowTaskWhereUniqueInput
-  update: WorkflowTaskUpdateWithoutParentsDataInput
-  create: WorkflowTaskCreateWithoutParentsInput
+export interface ServiceUpdateWithoutTasksDataInput {
+  title?: String
+  description?: String
+  events?: EventUpdateManyWithoutServiceInput
 }
 
 export interface EventCreateOneInput {
@@ -3215,32 +3228,172 @@ export interface EventCreateOneInput {
   connect?: EventWhereUniqueInput
 }
 
-export interface WorkflowTaskUpdateWithoutChildrenDataInput {
-  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
-  blacklist?: RunnerUpdateManyWithoutTaskBlacklistedInput
-  task?: TaskUpdateOneInput
-  parameters?: WorkflowResultUpdateManyInput
-  parents?: WorkflowTaskUpdateManyWithoutParentsInput
+export interface ServiceUpdateOneWithoutTasksInput {
+  create?: ServiceCreateWithoutTasksInput
+  connect?: ServiceWhereUniqueInput
+  disconnect?: ServiceWhereUniqueInput
+  delete?: ServiceWhereUniqueInput
+  update?: ServiceUpdateWithoutTasksInput
+  upsert?: ServiceUpsertWithoutTasksInput
 }
 
 export interface EventCreateInput {
   title: String
   description?: String
   data?: ParameterCreateManyInput
+  service: ServiceCreateOneWithoutEventsInput
 }
 
-export interface WorkflowTaskUpdateManyWithoutChildrenInput {
-  create?: WorkflowTaskCreateWithoutChildrenInput[] | WorkflowTaskCreateWithoutChildrenInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  update?: WorkflowTaskUpdateWithoutChildrenInput[] | WorkflowTaskUpdateWithoutChildrenInput
-  upsert?: WorkflowTaskUpsertWithoutChildrenInput[] | WorkflowTaskUpsertWithoutChildrenInput
+export interface ServiceUpsertWithoutEventsInput {
+  where: ServiceWhereUniqueInput
+  update: ServiceUpdateWithoutEventsDataInput
+  create: ServiceCreateWithoutEventsInput
+}
+
+export interface ServiceCreateOneWithoutEventsInput {
+  create?: ServiceCreateWithoutEventsInput
+  connect?: ServiceWhereUniqueInput
+}
+
+export interface TaskUpdateWithoutServiceDataInput {
+  title?: String
+  description?: String
+  arguments?: ParameterUpdateManyInput
+}
+
+export interface ServiceCreateWithoutEventsInput {
+  title: String
+  description?: String
+  tasks?: TaskCreateManyWithoutServiceInput
+}
+
+export interface TaskUpdateManyWithoutServiceInput {
+  create?: TaskCreateWithoutServiceInput[] | TaskCreateWithoutServiceInput
+  connect?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
+  disconnect?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
+  delete?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
+  update?: TaskUpdateWithoutServiceInput[] | TaskUpdateWithoutServiceInput
+  upsert?: TaskUpsertWithoutServiceInput[] | TaskUpsertWithoutServiceInput
+}
+
+export interface WorkflowTaskUpsertWithoutBlacklistInput {
+  where: WorkflowTaskWhereUniqueInput
+  update: WorkflowTaskUpdateWithoutBlacklistDataInput
+  create: WorkflowTaskCreateWithoutBlacklistInput
+}
+
+export interface ServiceUpdateWithoutEventsInput {
+  where: ServiceWhereUniqueInput
+  data: ServiceUpdateWithoutEventsDataInput
+}
+
+export interface TaskCreateWithoutServiceInput {
+  title: String
+  description?: String
+  arguments?: ParameterCreateManyInput
+}
+
+export interface ParameterUpdateManyInput {
+  create?: ParameterCreateInput[] | ParameterCreateInput
+  connect?: ParameterWhereUniqueInput[] | ParameterWhereUniqueInput
+  disconnect?: ParameterWhereUniqueInput[] | ParameterWhereUniqueInput
+  delete?: ParameterWhereUniqueInput[] | ParameterWhereUniqueInput
 }
 
 export interface FilterDefinitionCreateManyInput {
   create?: FilterDefinitionCreateInput[] | FilterDefinitionCreateInput
   connect?: FilterDefinitionWhereUniqueInput[] | FilterDefinitionWhereUniqueInput
+}
+
+export interface ParameterUpdateOneInput {
+  create?: ParameterCreateInput
+  connect?: ParameterWhereUniqueInput
+  disconnect?: ParameterWhereUniqueInput
+  delete?: ParameterWhereUniqueInput
+}
+
+export interface FilterDefinitionCreateInput {
+  predicate?: PREDICATE
+  value: String
+  parameter: ParameterCreateOneInput
+}
+
+export interface ParameterUpdateInput {
+  title?: String
+  description?: String
+  type?: TYPE
+  required?: Boolean
+}
+
+export interface ServiceCreateInput {
+  title: String
+  description?: String
+  events?: EventCreateManyWithoutServiceInput
+  tasks?: TaskCreateManyWithoutServiceInput
+}
+
+export interface RunnerUpsertWithoutSourceBlacklistedInput {
+  where: RunnerWhereUniqueInput
+  update: RunnerUpdateWithoutSourceBlacklistedDataInput
+  create: RunnerCreateWithoutSourceBlacklistedInput
+}
+
+export interface WorkflowConstantCreateInput {
+  value: String
+}
+
+export interface RunnerUpsertWithoutTaskBlacklistedInput {
+  where: RunnerWhereUniqueInput
+  update: RunnerUpdateWithoutTaskBlacklistedDataInput
+  create: RunnerCreateWithoutTaskBlacklistedInput
+}
+
+export interface WorkflowSourceCreateInput {
+  whitelist?: RunnerCreateManyWithoutSourceWhitelistedInput
+  blacklist?: RunnerCreateManyWithoutSourceBlacklistedInput
+  event: EventCreateOneInput
+  filters?: FilterDefinitionCreateManyInput
+}
+
+export interface FilterDefinitionUpdateManyInput {
+  create?: FilterDefinitionCreateInput[] | FilterDefinitionCreateInput
+  connect?: FilterDefinitionWhereUniqueInput[] | FilterDefinitionWhereUniqueInput
+  disconnect?: FilterDefinitionWhereUniqueInput[] | FilterDefinitionWhereUniqueInput
+  delete?: FilterDefinitionWhereUniqueInput[] | FilterDefinitionWhereUniqueInput
+}
+
+export interface WorkflowTaskCreateInput {
+  whitelist?: RunnerCreateManyWithoutTaskWhitelistedInput
+  blacklist?: RunnerCreateManyWithoutTaskBlacklistedInput
+  task: TaskCreateOneInput
+  parameters?: WorkflowResultCreateManyInput
+  parents?: WorkflowTaskCreateManyWithoutParentsInput
+  children?: WorkflowTaskCreateManyWithoutChildrenInput
+}
+
+export interface RunnerUpsertWithoutSourceWhitelistedInput {
+  where: RunnerWhereUniqueInput
+  update: RunnerUpdateWithoutSourceWhitelistedDataInput
+  create: RunnerCreateWithoutSourceWhitelistedInput
+}
+
+export interface WorkflowCreateInput {
+  title: String
+  description?: String
+  source: WorkflowSourceCreateOneInput
+  tasks?: WorkflowTaskCreateManyInput
+  executions?: WorkflowExecutionCreateManyInput
+}
+
+export interface WorkflowSourceCreateManyWithoutWhitelistInput {
+  create?: WorkflowSourceCreateWithoutWhitelistInput[] | WorkflowSourceCreateWithoutWhitelistInput
+  connect?: WorkflowSourceWhereUniqueInput[] | WorkflowSourceWhereUniqueInput
+}
+
+export interface WorkflowTaskUpsertWithoutParentsInput {
+  where: WorkflowTaskWhereUniqueInput
+  update: WorkflowTaskUpdateWithoutParentsDataInput
+  create: WorkflowTaskCreateWithoutParentsInput
 }
 
 export interface WorkflowSubscriptionWhereInput {
@@ -3253,27 +3406,9 @@ export interface WorkflowSubscriptionWhereInput {
   node?: WorkflowWhereInput
 }
 
-export interface FilterDefinitionCreateInput {
-  predicate?: PREDICATE
-  value: String
-  parameter: ParameterCreateOneInput
-}
-
-export interface WorkflowSourceSubscriptionWhereInput {
-  AND?: WorkflowSourceSubscriptionWhereInput[] | WorkflowSourceSubscriptionWhereInput
-  OR?: WorkflowSourceSubscriptionWhereInput[] | WorkflowSourceSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: WorkflowSourceWhereInput
-}
-
-export interface ServiceCreateInput {
-  title: String
-  description?: String
-  events?: EventCreateManyInput
-  tasks?: TaskCreateManyInput
+export interface WorkflowTaskCreateManyInput {
+  create?: WorkflowTaskCreateInput[] | WorkflowTaskCreateInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
 }
 
 export interface WorkflowTaskWhereInput {
@@ -3311,9 +3446,66 @@ export interface WorkflowTaskWhereInput {
   children_none?: WorkflowTaskWhereInput
 }
 
-export interface EventCreateManyInput {
-  create?: EventCreateInput[] | EventCreateInput
-  connect?: EventWhereUniqueInput[] | EventWhereUniqueInput
+export interface WorkflowExecutionCreateManyInput {
+  create?: WorkflowExecutionCreateInput[] | WorkflowExecutionCreateInput
+  connect?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
+}
+
+export interface TaskWhereInput {
+  AND?: TaskWhereInput[] | TaskWhereInput
+  OR?: TaskWhereInput[] | TaskWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  title?: String
+  title_not?: String
+  title_in?: String[] | String
+  title_not_in?: String[] | String
+  title_lt?: String
+  title_lte?: String
+  title_gt?: String
+  title_gte?: String
+  title_contains?: String
+  title_not_contains?: String
+  title_starts_with?: String
+  title_not_starts_with?: String
+  title_ends_with?: String
+  title_not_ends_with?: String
+  description?: String
+  description_not?: String
+  description_in?: String[] | String
+  description_not_in?: String[] | String
+  description_lt?: String
+  description_lte?: String
+  description_gt?: String
+  description_gte?: String
+  description_contains?: String
+  description_not_contains?: String
+  description_starts_with?: String
+  description_not_starts_with?: String
+  description_ends_with?: String
+  description_not_ends_with?: String
+  arguments_every?: ParameterWhereInput
+  arguments_some?: ParameterWhereInput
+  arguments_none?: ParameterWhereInput
+  service?: ServiceWhereInput
+}
+
+export interface WorkflowExecutionCreateInput {
+  duration: Int
+  fee: Int
+  taskExecutions?: WorkflowTaskExecutionCreateManyInput
 }
 
 export interface EventSubscriptionWhereInput {
@@ -3326,9 +3518,9 @@ export interface EventSubscriptionWhereInput {
   node?: EventWhereInput
 }
 
-export interface TaskCreateManyInput {
-  create?: TaskCreateInput[] | TaskCreateInput
-  connect?: TaskWhereUniqueInput[] | TaskWhereUniqueInput
+export interface WorkflowTaskExecutionCreateManyInput {
+  create?: WorkflowTaskExecutionCreateInput[] | WorkflowTaskExecutionCreateInput
+  connect?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
 }
 
 export interface WorkflowWhereInput {
@@ -3385,12 +3577,10 @@ export interface WorkflowWhereInput {
   executions_none?: WorkflowExecutionWhereInput
 }
 
-export interface WorkflowTaskUpdateWithoutBlacklistDataInput {
-  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
-  task?: TaskUpdateOneInput
-  parameters?: WorkflowResultUpdateManyInput
-  parents?: WorkflowTaskUpdateManyWithoutParentsInput
-  children?: WorkflowTaskUpdateManyWithoutChildrenInput
+export interface WorkflowTaskExecutionCreateInput {
+  duration: Int
+  fee: Int
+  results?: WorkflowResultCreateManyInput
 }
 
 export interface ParameterSubscriptionWhereInput {
@@ -3403,116 +3593,6 @@ export interface ParameterSubscriptionWhereInput {
   node?: ParameterWhereInput
 }
 
-export interface WorkflowSourceCreateInput {
-  whitelist?: RunnerCreateManyWithoutSourceWhitelistedInput
-  blacklist?: RunnerCreateManyWithoutSourceBlacklistedInput
-  event: EventCreateOneInput
-  filters?: FilterDefinitionCreateManyInput
-}
-
-export interface WorkflowTaskExecutionUpdateManyInput {
-  create?: WorkflowTaskExecutionCreateInput[] | WorkflowTaskExecutionCreateInput
-  connect?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
-  disconnect?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
-  delete?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
-}
-
-export interface WorkflowTaskCreateInput {
-  whitelist?: RunnerCreateManyWithoutTaskWhitelistedInput
-  blacklist?: RunnerCreateManyWithoutTaskBlacklistedInput
-  task: TaskCreateOneInput
-  parameters?: WorkflowResultCreateManyInput
-  parents?: WorkflowTaskCreateManyWithoutParentsInput
-  children?: WorkflowTaskCreateManyWithoutChildrenInput
-}
-
-export interface EventWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface WorkflowCreateInput {
-  title: String
-  description?: String
-  source: WorkflowSourceCreateOneInput
-  tasks?: WorkflowTaskCreateManyInput
-  executions?: WorkflowExecutionCreateManyInput
-}
-
-export interface WorkflowSourceWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface WorkflowSourceCreateOneInput {
-  create?: WorkflowSourceCreateInput
-  connect?: WorkflowSourceWhereUniqueInput
-}
-
-export interface WorkflowExecutionWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface WorkflowTaskCreateManyInput {
-  create?: WorkflowTaskCreateInput[] | WorkflowTaskCreateInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-}
-
-export interface WorkflowTaskUpdateManyInput {
-  create?: WorkflowTaskCreateInput[] | WorkflowTaskCreateInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-}
-
-export interface WorkflowExecutionCreateManyInput {
-  create?: WorkflowExecutionCreateInput[] | WorkflowExecutionCreateInput
-  connect?: WorkflowExecutionWhereUniqueInput[] | WorkflowExecutionWhereUniqueInput
-}
-
-export interface WorkflowTaskUpdateInput {
-  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
-  blacklist?: RunnerUpdateManyWithoutTaskBlacklistedInput
-  task?: TaskUpdateOneInput
-  parameters?: WorkflowResultUpdateManyInput
-  parents?: WorkflowTaskUpdateManyWithoutParentsInput
-  children?: WorkflowTaskUpdateManyWithoutChildrenInput
-}
-
-export interface WorkflowExecutionCreateInput {
-  duration: Int
-  fee: Int
-  taskExecutions?: WorkflowTaskExecutionCreateManyInput
-}
-
-export interface EventUpdateManyInput {
-  create?: EventCreateInput[] | EventCreateInput
-  connect?: EventWhereUniqueInput[] | EventWhereUniqueInput
-  disconnect?: EventWhereUniqueInput[] | EventWhereUniqueInput
-  delete?: EventWhereUniqueInput[] | EventWhereUniqueInput
-}
-
-export interface WorkflowTaskExecutionCreateManyInput {
-  create?: WorkflowTaskExecutionCreateInput[] | WorkflowTaskExecutionCreateInput
-  connect?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
-}
-
-export interface EventUpdateInput {
-  title?: String
-  description?: String
-  data?: ParameterUpdateManyInput
-}
-
-export interface WorkflowTaskExecutionCreateInput {
-  duration: Int
-  fee: Int
-  results?: WorkflowResultCreateManyInput
-}
-
-export interface WorkflowSourceUpsertWithoutWhitelistInput {
-  where: WorkflowSourceWhereUniqueInput
-  update: WorkflowSourceUpdateWithoutWhitelistDataInput
-  create: WorkflowSourceCreateWithoutWhitelistInput
-}
-
 export interface RunnerUpdateInput {
   publicKey?: String
   stake?: Float
@@ -3523,10 +3603,11 @@ export interface RunnerUpdateInput {
   taskBlacklisted?: WorkflowTaskUpdateManyWithoutBlacklistInput
 }
 
-export interface WorkflowSourceUpsertWithoutBlacklistInput {
-  where: WorkflowSourceWhereUniqueInput
-  update: WorkflowSourceUpdateWithoutBlacklistDataInput
-  create: WorkflowSourceCreateWithoutBlacklistInput
+export interface WorkflowTaskExecutionUpdateManyInput {
+  create?: WorkflowTaskExecutionCreateInput[] | WorkflowTaskExecutionCreateInput
+  connect?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
+  disconnect?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
+  delete?: WorkflowTaskExecutionWhereUniqueInput[] | WorkflowTaskExecutionWhereUniqueInput
 }
 
 export interface WorkflowSourceUpdateManyWithoutWhitelistInput {
@@ -3538,10 +3619,8 @@ export interface WorkflowSourceUpdateManyWithoutWhitelistInput {
   upsert?: WorkflowSourceUpsertWithoutWhitelistInput[] | WorkflowSourceUpsertWithoutWhitelistInput
 }
 
-export interface WorkflowTaskUpsertWithoutBlacklistInput {
-  where: WorkflowTaskWhereUniqueInput
-  update: WorkflowTaskUpdateWithoutBlacklistDataInput
-  create: WorkflowTaskCreateWithoutBlacklistInput
+export interface EventWhereUniqueInput {
+  id?: ID_Input
 }
 
 export interface WorkflowSourceUpdateWithoutWhitelistInput {
@@ -3549,9 +3628,8 @@ export interface WorkflowSourceUpdateWithoutWhitelistInput {
   data: WorkflowSourceUpdateWithoutWhitelistDataInput
 }
 
-export interface WorkflowTaskUpdateWithoutChildrenInput {
-  where: WorkflowTaskWhereUniqueInput
-  data: WorkflowTaskUpdateWithoutChildrenDataInput
+export interface WorkflowSourceWhereUniqueInput {
+  id?: ID_Input
 }
 
 export interface WorkflowSourceUpdateWithoutWhitelistDataInput {
@@ -3560,14 +3638,8 @@ export interface WorkflowSourceUpdateWithoutWhitelistDataInput {
   filters?: FilterDefinitionUpdateManyInput
 }
 
-export interface WorkflowTaskSubscriptionWhereInput {
-  AND?: WorkflowTaskSubscriptionWhereInput[] | WorkflowTaskSubscriptionWhereInput
-  OR?: WorkflowTaskSubscriptionWhereInput[] | WorkflowTaskSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: WorkflowTaskWhereInput
+export interface WorkflowExecutionWhereUniqueInput {
+  id?: ID_Input
 }
 
 export interface RunnerUpdateManyWithoutSourceBlacklistedInput {
@@ -3579,57 +3651,11 @@ export interface RunnerUpdateManyWithoutSourceBlacklistedInput {
   upsert?: RunnerUpsertWithoutSourceBlacklistedInput[] | RunnerUpsertWithoutSourceBlacklistedInput
 }
 
-export interface ServiceWhereInput {
-  AND?: ServiceWhereInput[] | ServiceWhereInput
-  OR?: ServiceWhereInput[] | ServiceWhereInput
-  id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  title?: String
-  title_not?: String
-  title_in?: String[] | String
-  title_not_in?: String[] | String
-  title_lt?: String
-  title_lte?: String
-  title_gt?: String
-  title_gte?: String
-  title_contains?: String
-  title_not_contains?: String
-  title_starts_with?: String
-  title_not_starts_with?: String
-  title_ends_with?: String
-  title_not_ends_with?: String
-  description?: String
-  description_not?: String
-  description_in?: String[] | String
-  description_not_in?: String[] | String
-  description_lt?: String
-  description_lte?: String
-  description_gt?: String
-  description_gte?: String
-  description_contains?: String
-  description_not_contains?: String
-  description_starts_with?: String
-  description_not_starts_with?: String
-  description_ends_with?: String
-  description_not_ends_with?: String
-  events_every?: EventWhereInput
-  events_some?: EventWhereInput
-  events_none?: EventWhereInput
-  tasks_every?: TaskWhereInput
-  tasks_some?: TaskWhereInput
-  tasks_none?: TaskWhereInput
+export interface WorkflowTaskUpdateManyInput {
+  create?: WorkflowTaskCreateInput[] | WorkflowTaskCreateInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
 }
 
 export interface RunnerUpdateWithoutSourceBlacklistedInput {
@@ -3637,42 +3663,13 @@ export interface RunnerUpdateWithoutSourceBlacklistedInput {
   data: RunnerUpdateWithoutSourceBlacklistedDataInput
 }
 
-export interface WorkflowTaskExecutionWhereInput {
-  AND?: WorkflowTaskExecutionWhereInput[] | WorkflowTaskExecutionWhereInput
-  OR?: WorkflowTaskExecutionWhereInput[] | WorkflowTaskExecutionWhereInput
-  id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  duration?: Int
-  duration_not?: Int
-  duration_in?: Int[] | Int
-  duration_not_in?: Int[] | Int
-  duration_lt?: Int
-  duration_lte?: Int
-  duration_gt?: Int
-  duration_gte?: Int
-  fee?: Int
-  fee_not?: Int
-  fee_in?: Int[] | Int
-  fee_not_in?: Int[] | Int
-  fee_lt?: Int
-  fee_lte?: Int
-  fee_gt?: Int
-  fee_gte?: Int
-  results_every?: WorkflowResultWhereInput
-  results_some?: WorkflowResultWhereInput
-  results_none?: WorkflowResultWhereInput
+export interface WorkflowTaskUpdateInput {
+  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
+  blacklist?: RunnerUpdateManyWithoutTaskBlacklistedInput
+  task?: TaskUpdateOneInput
+  parameters?: WorkflowResultUpdateManyInput
+  parents?: WorkflowTaskUpdateManyWithoutParentsInput
+  children?: WorkflowTaskUpdateManyWithoutChildrenInput
 }
 
 export interface RunnerUpdateWithoutSourceBlacklistedDataInput {
@@ -3684,8 +3681,10 @@ export interface RunnerUpdateWithoutSourceBlacklistedDataInput {
   taskBlacklisted?: WorkflowTaskUpdateManyWithoutBlacklistInput
 }
 
-export interface ParameterWhereUniqueInput {
-  id?: ID_Input
+export interface ServiceUpsertWithoutTasksInput {
+  where: ServiceWhereUniqueInput
+  update: ServiceUpdateWithoutTasksDataInput
+  create: ServiceCreateWithoutTasksInput
 }
 
 export interface WorkflowTaskUpdateManyWithoutWhitelistInput {
@@ -3697,8 +3696,13 @@ export interface WorkflowTaskUpdateManyWithoutWhitelistInput {
   upsert?: WorkflowTaskUpsertWithoutWhitelistInput[] | WorkflowTaskUpsertWithoutWhitelistInput
 }
 
-export interface WorkflowResultWhereUniqueInput {
-  id?: ID_Input
+export interface EventUpdateManyWithoutServiceInput {
+  create?: EventCreateWithoutServiceInput[] | EventCreateWithoutServiceInput
+  connect?: EventWhereUniqueInput[] | EventWhereUniqueInput
+  disconnect?: EventWhereUniqueInput[] | EventWhereUniqueInput
+  delete?: EventWhereUniqueInput[] | EventWhereUniqueInput
+  update?: EventUpdateWithoutServiceInput[] | EventUpdateWithoutServiceInput
+  upsert?: EventUpsertWithoutServiceInput[] | EventUpsertWithoutServiceInput
 }
 
 export interface WorkflowTaskUpdateWithoutWhitelistInput {
@@ -3706,12 +3710,11 @@ export interface WorkflowTaskUpdateWithoutWhitelistInput {
   data: WorkflowTaskUpdateWithoutWhitelistDataInput
 }
 
-export interface WorkflowUpdateInput {
+export interface TaskUpdateInput {
   title?: String
   description?: String
-  source?: WorkflowSourceUpdateOneInput
-  tasks?: WorkflowTaskUpdateManyInput
-  executions?: WorkflowExecutionUpdateManyInput
+  arguments?: ParameterUpdateManyInput
+  service?: ServiceUpdateOneWithoutTasksInput
 }
 
 export interface WorkflowTaskUpdateWithoutWhitelistDataInput {
@@ -3722,10 +3725,9 @@ export interface WorkflowTaskUpdateWithoutWhitelistDataInput {
   children?: WorkflowTaskUpdateManyWithoutChildrenInput
 }
 
-export interface TaskUpdateInput {
-  title?: String
-  description?: String
-  arguments?: ParameterUpdateManyInput
+export interface TaskUpdateWithoutServiceInput {
+  where: TaskWhereUniqueInput
+  data: TaskUpdateWithoutServiceDataInput
 }
 
 export interface RunnerUpdateManyWithoutTaskBlacklistedInput {
@@ -3737,10 +3739,13 @@ export interface RunnerUpdateManyWithoutTaskBlacklistedInput {
   upsert?: RunnerUpsertWithoutTaskBlacklistedInput[] | RunnerUpsertWithoutTaskBlacklistedInput
 }
 
-export interface WorkflowTaskUpsertWithoutWhitelistInput {
-  where: WorkflowTaskWhereUniqueInput
-  update: WorkflowTaskUpdateWithoutWhitelistDataInput
-  create: WorkflowTaskCreateWithoutWhitelistInput
+export interface ServiceUpdateOneWithoutEventsInput {
+  create?: ServiceCreateWithoutEventsInput
+  connect?: ServiceWhereUniqueInput
+  disconnect?: ServiceWhereUniqueInput
+  delete?: ServiceWhereUniqueInput
+  update?: ServiceUpdateWithoutEventsInput
+  upsert?: ServiceUpsertWithoutEventsInput
 }
 
 export interface RunnerUpdateWithoutTaskBlacklistedInput {
@@ -3748,10 +3753,10 @@ export interface RunnerUpdateWithoutTaskBlacklistedInput {
   data: RunnerUpdateWithoutTaskBlacklistedDataInput
 }
 
-export interface WorkflowTaskUpsertWithoutChildrenInput {
-  where: WorkflowTaskWhereUniqueInput
-  update: WorkflowTaskUpdateWithoutChildrenDataInput
-  create: WorkflowTaskCreateWithoutChildrenInput
+export interface FilterDefinitionUpdateInput {
+  predicate?: PREDICATE
+  value?: String
+  parameter?: ParameterUpdateOneInput
 }
 
 export interface RunnerUpdateWithoutTaskBlacklistedDataInput {
@@ -3763,54 +3768,10 @@ export interface RunnerUpdateWithoutTaskBlacklistedDataInput {
   taskWhitelisted?: WorkflowTaskUpdateManyWithoutWhitelistInput
 }
 
-export interface TaskWhereInput {
-  AND?: TaskWhereInput[] | TaskWhereInput
-  OR?: TaskWhereInput[] | TaskWhereInput
-  id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  title?: String
-  title_not?: String
-  title_in?: String[] | String
-  title_not_in?: String[] | String
-  title_lt?: String
-  title_lte?: String
-  title_gt?: String
-  title_gte?: String
-  title_contains?: String
-  title_not_contains?: String
-  title_starts_with?: String
-  title_not_starts_with?: String
-  title_ends_with?: String
-  title_not_ends_with?: String
-  description?: String
-  description_not?: String
-  description_in?: String[] | String
-  description_not_in?: String[] | String
-  description_lt?: String
-  description_lte?: String
-  description_gt?: String
-  description_gte?: String
-  description_contains?: String
-  description_not_contains?: String
-  description_starts_with?: String
-  description_not_starts_with?: String
-  description_ends_with?: String
-  description_not_ends_with?: String
-  arguments_every?: ParameterWhereInput
-  arguments_some?: ParameterWhereInput
-  arguments_none?: ParameterWhereInput
+export interface WorkflowTaskUpsertWithoutWhitelistInput {
+  where: WorkflowTaskWhereUniqueInput
+  update: WorkflowTaskUpdateWithoutWhitelistDataInput
+  create: WorkflowTaskCreateWithoutWhitelistInput
 }
 
 export interface WorkflowSourceUpdateManyWithoutBlacklistInput {
@@ -3822,37 +3783,16 @@ export interface WorkflowSourceUpdateManyWithoutBlacklistInput {
   upsert?: WorkflowSourceUpsertWithoutBlacklistInput[] | WorkflowSourceUpsertWithoutBlacklistInput
 }
 
-export interface RunnerSubscriptionWhereInput {
-  AND?: RunnerSubscriptionWhereInput[] | RunnerSubscriptionWhereInput
-  OR?: RunnerSubscriptionWhereInput[] | RunnerSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: RunnerWhereInput
+export interface EventUpdateOneInput {
+  create?: EventCreateInput
+  connect?: EventWhereUniqueInput
+  disconnect?: EventWhereUniqueInput
+  delete?: EventWhereUniqueInput
 }
 
 export interface WorkflowSourceUpdateWithoutBlacklistInput {
   where: WorkflowSourceWhereUniqueInput
   data: WorkflowSourceUpdateWithoutBlacklistDataInput
-}
-
-export interface WorkflowExecutionUpdateInput {
-  duration?: Int
-  fee?: Int
-  taskExecutions?: WorkflowTaskExecutionUpdateManyInput
-}
-
-export interface WorkflowSourceUpdateWithoutBlacklistDataInput {
-  whitelist?: RunnerUpdateManyWithoutSourceWhitelistedInput
-  event?: EventUpdateOneInput
-  filters?: FilterDefinitionUpdateManyInput
-}
-
-export interface FilterDefinitionUpdateInput {
-  predicate?: PREDICATE
-  value?: String
-  parameter?: ParameterUpdateOneInput
 }
 
 export interface WorkflowTaskExecutionSubscriptionWhereInput {
@@ -3865,27 +3805,48 @@ export interface WorkflowTaskExecutionSubscriptionWhereInput {
   node?: WorkflowTaskExecutionWhereInput
 }
 
-export interface WorkflowTaskUpdateManyWithoutBlacklistInput {
-  create?: WorkflowTaskCreateWithoutBlacklistInput[] | WorkflowTaskCreateWithoutBlacklistInput
-  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
-  update?: WorkflowTaskUpdateWithoutBlacklistInput[] | WorkflowTaskUpdateWithoutBlacklistInput
-  upsert?: WorkflowTaskUpsertWithoutBlacklistInput[] | WorkflowTaskUpsertWithoutBlacklistInput
+export interface WorkflowSourceUpdateWithoutBlacklistDataInput {
+  whitelist?: RunnerUpdateManyWithoutSourceWhitelistedInput
+  event?: EventUpdateOneInput
+  filters?: FilterDefinitionUpdateManyInput
 }
 
-export interface RunnerUpdateWithoutSourceWhitelistedDataInput {
-  publicKey?: String
-  stake?: Float
-  reliability?: Float
-  sourceBlacklisted?: WorkflowSourceUpdateManyWithoutBlacklistInput
-  taskWhitelisted?: WorkflowTaskUpdateManyWithoutWhitelistInput
-  taskBlacklisted?: WorkflowTaskUpdateManyWithoutBlacklistInput
-}
-
-export interface RunnerUpdateWithoutSourceWhitelistedInput {
-  where: RunnerWhereUniqueInput
-  data: RunnerUpdateWithoutSourceWhitelistedDataInput
+export interface FilterDefinitionWhereInput {
+  AND?: FilterDefinitionWhereInput[] | FilterDefinitionWhereInput
+  OR?: FilterDefinitionWhereInput[] | FilterDefinitionWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  predicate?: PREDICATE
+  predicate_not?: PREDICATE
+  predicate_in?: PREDICATE[] | PREDICATE
+  predicate_not_in?: PREDICATE[] | PREDICATE
+  value?: String
+  value_not?: String
+  value_in?: String[] | String
+  value_not_in?: String[] | String
+  value_lt?: String
+  value_lte?: String
+  value_gt?: String
+  value_gte?: String
+  value_contains?: String
+  value_not_contains?: String
+  value_starts_with?: String
+  value_not_starts_with?: String
+  value_ends_with?: String
+  value_not_ends_with?: String
+  parameter?: ParameterWhereInput
 }
 
 export interface RunnerUpdateManyWithoutSourceWhitelistedInput {
@@ -3950,19 +3911,320 @@ export interface ParameterWhereInput {
   required_not?: Boolean
 }
 
-export interface EventUpdateOneInput {
-  create?: EventCreateInput
-  connect?: EventWhereUniqueInput
-  disconnect?: EventWhereUniqueInput
-  delete?: EventWhereUniqueInput
+export interface RunnerUpdateWithoutSourceWhitelistedInput {
+  where: RunnerWhereUniqueInput
+  data: RunnerUpdateWithoutSourceWhitelistedDataInput
+}
+
+export interface RunnerSubscriptionWhereInput {
+  AND?: RunnerSubscriptionWhereInput[] | RunnerSubscriptionWhereInput
+  OR?: RunnerSubscriptionWhereInput[] | RunnerSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: RunnerWhereInput
+}
+
+export interface RunnerUpdateWithoutSourceWhitelistedDataInput {
+  publicKey?: String
+  stake?: Float
+  reliability?: Float
+  sourceBlacklisted?: WorkflowSourceUpdateManyWithoutBlacklistInput
+  taskWhitelisted?: WorkflowTaskUpdateManyWithoutWhitelistInput
+  taskBlacklisted?: WorkflowTaskUpdateManyWithoutBlacklistInput
+}
+
+export interface ServiceWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface WorkflowTaskUpdateManyWithoutBlacklistInput {
+  create?: WorkflowTaskCreateWithoutBlacklistInput[] | WorkflowTaskCreateWithoutBlacklistInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  update?: WorkflowTaskUpdateWithoutBlacklistInput[] | WorkflowTaskUpdateWithoutBlacklistInput
+  upsert?: WorkflowTaskUpsertWithoutBlacklistInput[] | WorkflowTaskUpsertWithoutBlacklistInput
+}
+
+export interface WorkflowExecutionUpdateInput {
+  duration?: Int
+  fee?: Int
+  taskExecutions?: WorkflowTaskExecutionUpdateManyInput
+}
+
+export interface WorkflowTaskUpdateWithoutBlacklistInput {
+  where: WorkflowTaskWhereUniqueInput
+  data: WorkflowTaskUpdateWithoutBlacklistDataInput
 }
 
 export interface WorkflowConstantUpdateInput {
   value?: String
 }
 
-export interface ServiceWhereUniqueInput {
+export interface WorkflowTaskUpdateWithoutBlacklistDataInput {
+  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
+  task?: TaskUpdateOneInput
+  parameters?: WorkflowResultUpdateManyInput
+  parents?: WorkflowTaskUpdateManyWithoutParentsInput
+  children?: WorkflowTaskUpdateManyWithoutChildrenInput
+}
+
+export interface ServiceUpdateWithoutTasksInput {
+  where: ServiceWhereUniqueInput
+  data: ServiceUpdateWithoutTasksDataInput
+}
+
+export interface RunnerUpdateManyWithoutTaskWhitelistedInput {
+  create?: RunnerCreateWithoutTaskWhitelistedInput[] | RunnerCreateWithoutTaskWhitelistedInput
+  connect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
+  disconnect?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
+  delete?: RunnerWhereUniqueInput[] | RunnerWhereUniqueInput
+  update?: RunnerUpdateWithoutTaskWhitelistedInput[] | RunnerUpdateWithoutTaskWhitelistedInput
+  upsert?: RunnerUpsertWithoutTaskWhitelistedInput[] | RunnerUpsertWithoutTaskWhitelistedInput
+}
+
+export interface ServiceUpdateWithoutEventsDataInput {
+  title?: String
+  description?: String
+  tasks?: TaskUpdateManyWithoutServiceInput
+}
+
+export interface RunnerUpdateWithoutTaskWhitelistedInput {
+  where: RunnerWhereUniqueInput
+  data: RunnerUpdateWithoutTaskWhitelistedDataInput
+}
+
+export interface WorkflowSourceUpsertWithoutWhitelistInput {
+  where: WorkflowSourceWhereUniqueInput
+  update: WorkflowSourceUpdateWithoutWhitelistDataInput
+  create: WorkflowSourceCreateWithoutWhitelistInput
+}
+
+export interface RunnerUpdateWithoutTaskWhitelistedDataInput {
+  publicKey?: String
+  stake?: Float
+  reliability?: Float
+  sourceWhitelisted?: WorkflowSourceUpdateManyWithoutWhitelistInput
+  sourceBlacklisted?: WorkflowSourceUpdateManyWithoutBlacklistInput
+  taskBlacklisted?: WorkflowTaskUpdateManyWithoutBlacklistInput
+}
+
+export interface RunnerCreateInput {
+  publicKey: String
+  stake?: Float
+  reliability?: Float
+  sourceWhitelisted?: WorkflowSourceCreateManyWithoutWhitelistInput
+  sourceBlacklisted?: WorkflowSourceCreateManyWithoutBlacklistInput
+  taskWhitelisted?: WorkflowTaskCreateManyWithoutWhitelistInput
+  taskBlacklisted?: WorkflowTaskCreateManyWithoutBlacklistInput
+}
+
+export interface RunnerUpsertWithoutTaskWhitelistedInput {
+  where: RunnerWhereUniqueInput
+  update: RunnerUpdateWithoutTaskWhitelistedDataInput
+  create: RunnerCreateWithoutTaskWhitelistedInput
+}
+
+export interface ServiceWhereInput {
+  AND?: ServiceWhereInput[] | ServiceWhereInput
+  OR?: ServiceWhereInput[] | ServiceWhereInput
   id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  title?: String
+  title_not?: String
+  title_in?: String[] | String
+  title_not_in?: String[] | String
+  title_lt?: String
+  title_lte?: String
+  title_gt?: String
+  title_gte?: String
+  title_contains?: String
+  title_not_contains?: String
+  title_starts_with?: String
+  title_not_starts_with?: String
+  title_ends_with?: String
+  title_not_ends_with?: String
+  description?: String
+  description_not?: String
+  description_in?: String[] | String
+  description_not_in?: String[] | String
+  description_lt?: String
+  description_lte?: String
+  description_gt?: String
+  description_gte?: String
+  description_contains?: String
+  description_not_contains?: String
+  description_starts_with?: String
+  description_not_starts_with?: String
+  description_ends_with?: String
+  description_not_ends_with?: String
+  events_every?: EventWhereInput
+  events_some?: EventWhereInput
+  events_none?: EventWhereInput
+  tasks_every?: TaskWhereInput
+  tasks_some?: TaskWhereInput
+  tasks_none?: TaskWhereInput
+}
+
+export interface TaskUpdateOneInput {
+  create?: TaskCreateInput
+  connect?: TaskWhereUniqueInput
+  disconnect?: TaskWhereUniqueInput
+  delete?: TaskWhereUniqueInput
+}
+
+export interface ParameterWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface WorkflowResultUpdateManyInput {
+  create?: WorkflowResultCreateInput[] | WorkflowResultCreateInput
+  connect?: WorkflowResultWhereUniqueInput[] | WorkflowResultWhereUniqueInput
+  disconnect?: WorkflowResultWhereUniqueInput[] | WorkflowResultWhereUniqueInput
+  delete?: WorkflowResultWhereUniqueInput[] | WorkflowResultWhereUniqueInput
+}
+
+export interface WorkflowUpdateInput {
+  title?: String
+  description?: String
+  source?: WorkflowSourceUpdateOneInput
+  tasks?: WorkflowTaskUpdateManyInput
+  executions?: WorkflowExecutionUpdateManyInput
+}
+
+export interface WorkflowTaskUpdateManyWithoutParentsInput {
+  create?: WorkflowTaskCreateWithoutParentsInput[] | WorkflowTaskCreateWithoutParentsInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  update?: WorkflowTaskUpdateWithoutParentsInput[] | WorkflowTaskUpdateWithoutParentsInput
+  upsert?: WorkflowTaskUpsertWithoutParentsInput[] | WorkflowTaskUpsertWithoutParentsInput
+}
+
+export interface TaskUpsertWithoutServiceInput {
+  where: TaskWhereUniqueInput
+  update: TaskUpdateWithoutServiceDataInput
+  create: TaskCreateWithoutServiceInput
+}
+
+export interface WorkflowTaskUpdateWithoutParentsInput {
+  where: WorkflowTaskWhereUniqueInput
+  data: WorkflowTaskUpdateWithoutParentsDataInput
+}
+
+export interface WorkflowSourceUpsertWithoutBlacklistInput {
+  where: WorkflowSourceWhereUniqueInput
+  update: WorkflowSourceUpdateWithoutBlacklistDataInput
+  create: WorkflowSourceCreateWithoutBlacklistInput
+}
+
+export interface WorkflowTaskExecutionWhereInput {
+  AND?: WorkflowTaskExecutionWhereInput[] | WorkflowTaskExecutionWhereInput
+  OR?: WorkflowTaskExecutionWhereInput[] | WorkflowTaskExecutionWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  duration?: Int
+  duration_not?: Int
+  duration_in?: Int[] | Int
+  duration_not_in?: Int[] | Int
+  duration_lt?: Int
+  duration_lte?: Int
+  duration_gt?: Int
+  duration_gte?: Int
+  fee?: Int
+  fee_not?: Int
+  fee_in?: Int[] | Int
+  fee_not_in?: Int[] | Int
+  fee_lt?: Int
+  fee_lte?: Int
+  fee_gt?: Int
+  fee_gte?: Int
+  results_every?: WorkflowResultWhereInput
+  results_some?: WorkflowResultWhereInput
+  results_none?: WorkflowResultWhereInput
+}
+
+export interface WorkflowTaskUpdateWithoutChildrenDataInput {
+  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
+  blacklist?: RunnerUpdateManyWithoutTaskBlacklistedInput
+  task?: TaskUpdateOneInput
+  parameters?: WorkflowResultUpdateManyInput
+  parents?: WorkflowTaskUpdateManyWithoutParentsInput
+}
+
+export interface WorkflowTaskUpdateWithoutChildrenInput {
+  where: WorkflowTaskWhereUniqueInput
+  data: WorkflowTaskUpdateWithoutChildrenDataInput
+}
+
+export interface WorkflowTaskUpdateManyWithoutChildrenInput {
+  create?: WorkflowTaskCreateWithoutChildrenInput[] | WorkflowTaskCreateWithoutChildrenInput
+  connect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  disconnect?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  delete?: WorkflowTaskWhereUniqueInput[] | WorkflowTaskWhereUniqueInput
+  update?: WorkflowTaskUpdateWithoutChildrenInput[] | WorkflowTaskUpdateWithoutChildrenInput
+  upsert?: WorkflowTaskUpsertWithoutChildrenInput[] | WorkflowTaskUpsertWithoutChildrenInput
+}
+
+export interface WorkflowTaskUpdateWithoutParentsDataInput {
+  whitelist?: RunnerUpdateManyWithoutTaskWhitelistedInput
+  blacklist?: RunnerUpdateManyWithoutTaskBlacklistedInput
+  task?: TaskUpdateOneInput
+  parameters?: WorkflowResultUpdateManyInput
+  children?: WorkflowTaskUpdateManyWithoutChildrenInput
+}
+
+export interface WorkflowResultWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface WorkflowTaskSubscriptionWhereInput {
+  AND?: WorkflowTaskSubscriptionWhereInput[] | WorkflowTaskSubscriptionWhereInput
+  OR?: WorkflowTaskSubscriptionWhereInput[] | WorkflowTaskSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: WorkflowTaskWhereInput
+}
+
+export interface EventUpdateInput {
+  title?: String
+  description?: String
+  data?: ParameterUpdateManyInput
+  service?: ServiceUpdateOneWithoutEventsInput
+}
+
+export interface EventUpdateWithoutServiceDataInput {
+  title?: String
+  description?: String
+  data?: ParameterUpdateManyInput
 }
 
 export interface Node {
@@ -3975,12 +4237,15 @@ export interface WorkflowTaskExecutionPreviousValues {
   fee: Int
 }
 
-export interface WorkflowSource extends Node {
+export interface Runner extends Node {
   id: ID_Output
-  whitelist?: Runner[]
-  blacklist?: Runner[]
-  event: Event
-  filters?: FilterDefinition[]
+  publicKey: String
+  stake: Float
+  reliability: Float
+  sourceWhitelisted?: WorkflowSource[]
+  sourceBlacklisted?: WorkflowSource[]
+  taskWhitelisted?: WorkflowTask[]
+  taskBlacklisted?: WorkflowTask[]
 }
 
 export interface BatchPayload {
@@ -3998,15 +4263,12 @@ export interface WorkflowTaskExecutionSubscriptionPayload {
   previousValues?: WorkflowTaskExecutionPreviousValues
 }
 
-export interface Runner extends Node {
+export interface Event extends Node {
   id: ID_Output
-  publicKey: String
-  stake: Float
-  reliability: Float
-  sourceWhitelisted?: WorkflowSource[]
-  sourceBlacklisted?: WorkflowSource[]
-  taskWhitelisted?: WorkflowTask[]
-  taskBlacklisted?: WorkflowTask[]
+  title: String
+  description?: String
+  data?: Parameter[]
+  service: Service
 }
 
 export interface WorkflowTaskExecutionEdge {
@@ -4042,11 +4304,12 @@ export interface WorkflowEdge {
   cursor: String
 }
 
-export interface Event extends Node {
+export interface WorkflowSource extends Node {
   id: ID_Output
-  title: String
-  description?: String
-  data?: Parameter[]
+  whitelist?: Runner[]
+  blacklist?: Runner[]
+  event: Event
+  filters?: FilterDefinition[]
 }
 
 export interface AggregateWorkflowResult {
@@ -4150,12 +4413,10 @@ export interface TaskEdge {
   cursor: String
 }
 
-export interface Service extends Node {
+export interface WorkflowExecutionPreviousValues {
   id: ID_Output
-  title: String
-  description?: String
-  events?: Event[]
-  tasks?: Task[]
+  duration: Int
+  fee: Int
 }
 
 export interface AggregateEvent {
@@ -4186,10 +4447,10 @@ export interface FilterDefinitionEdge {
   cursor: String
 }
 
-export interface WorkflowExecutionPreviousValues {
+export interface WorkflowResult extends Node {
   id: ID_Output
-  duration: Int
-  fee: Int
+  reference: Parameter
+  value: String
 }
 
 export interface AggregateParameter {
@@ -4220,10 +4481,14 @@ export interface RunnerEdge {
   cursor: String
 }
 
-export interface WorkflowResult extends Node {
+export interface WorkflowTask extends Node {
   id: ID_Output
-  reference: Parameter
-  value: String
+  whitelist?: Runner[]
+  blacklist?: Runner[]
+  task: Task
+  parameters?: WorkflowResult[]
+  parents?: WorkflowTask[]
+  children?: WorkflowTask[]
 }
 
 export interface RunnerConnection {
@@ -4256,11 +4521,11 @@ export interface WorkflowConnection {
   aggregate: AggregateWorkflow
 }
 
-export interface Task extends Node {
+export interface FilterDefinition extends Node {
   id: ID_Output
-  title: String
-  description?: String
-  arguments?: Parameter[]
+  parameter: Parameter
+  predicate: PREDICATE
+  value: String
 }
 
 export interface AggregateWorkflowTask {
@@ -4290,14 +4555,12 @@ export interface WorkflowConstantConnection {
   aggregate: AggregateWorkflowConstant
 }
 
-export interface WorkflowTask extends Node {
+export interface Task extends Node {
   id: ID_Output
-  whitelist?: Runner[]
-  blacklist?: Runner[]
-  task: Task
-  parameters?: WorkflowResult[]
-  parents?: WorkflowTask[]
-  children?: WorkflowTask[]
+  title: String
+  description?: String
+  arguments?: Parameter[]
+  service: Service
 }
 
 export interface AggregateTask {
@@ -4326,11 +4589,12 @@ export interface FilterDefinitionConnection {
   aggregate: AggregateFilterDefinition
 }
 
-export interface FilterDefinition extends Node {
+export interface Service extends Node {
   id: ID_Output
-  parameter: Parameter
-  predicate: PREDICATE
-  value: String
+  title: String
+  description?: String
+  events?: Event[]
+  tasks?: Task[]
 }
 
 export interface AggregateRunner {
@@ -4360,11 +4624,12 @@ export interface WorkflowResultEdge {
   cursor: String
 }
 
-export interface WorkflowExecutionSubscriptionPayload {
-  mutation: MutationType
-  node?: WorkflowExecution
-  updatedFields?: String[]
-  previousValues?: WorkflowExecutionPreviousValues
+export interface Parameter extends Node {
+  id: ID_Output
+  title: String
+  description?: String
+  type: TYPE
+  required?: Boolean
 }
 
 export interface AggregateWorkflowConstant {
@@ -4402,12 +4667,11 @@ export interface WorkflowSubscriptionPayload {
   previousValues?: WorkflowPreviousValues
 }
 
-export interface Parameter extends Node {
-  id: ID_Output
-  title: String
-  description?: String
-  type: TYPE
-  required?: Boolean
+export interface WorkflowExecutionSubscriptionPayload {
+  mutation: MutationType
+  node?: WorkflowExecution
+  updatedFields?: String[]
+  previousValues?: WorkflowExecutionPreviousValues
 }
 
 export interface WorkflowResultPreviousValues {
