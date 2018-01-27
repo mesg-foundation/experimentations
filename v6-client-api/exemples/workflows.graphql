@@ -2,10 +2,13 @@ fragment parameter on Parameter {
   title
   type
 }
+
 fragment filter on FilterDefinition {
-	parameter { ...parameter }
+  parameter {
+    ...parameter
+  }
   predicate
-  value  
+  value
 }
 
 query allWorkflows {
@@ -14,27 +17,47 @@ query allWorkflows {
     description
     source {
       event {
-        service { title }
+        service {
+          title
+        }
         title
-        data { ...parameter }
+        data {
+          ...parameter
+        }
       }
-      filters { ...filter }
-      whitelist { publicKey } 
-      blacklist  { publicKey }
+      filters {
+        ...filter
+      }
+      whitelist {
+        publicKey
+      }
+      blacklist {
+        publicKey
+      }
     }
     tasks {
       task {
-        service { title }
+        service {
+          title
+        }
         title
-        arguments { ...parameter }
+        arguments {
+          ...parameter
+        }
       }
       parameters {
-        reference { ...parameter }
+        reference {
+          ...parameter
+        }
         value
       }
 
-      whitelist { publicKey } 
-      blacklist  { publicKey }    
+      whitelist {
+        publicKey
+      }
+      blacklist {
+        publicKey
+      }
     }
   }
 }

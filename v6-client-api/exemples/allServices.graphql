@@ -23,10 +23,11 @@ fragment service on Service {
     title
     description
     arguments {
-      ...parameter 
+      ...parameter
     }
   }
 }
+
 {
   allservices: services {
     ...service

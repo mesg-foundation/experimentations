@@ -6,56 +6,58 @@
 # Find a complete workflow on https://www.graphqlbin.com/2kvghk
 
 mutation(
-  $sourceId: ID!,
-  $filter1: ID!,
-  $filter2: ID!,
-  $taskId: ID!,
-  $urlArg: ID!,
+  $sourceId: ID!
+  $filter1: ID!
+  $filter2: ID!
+  $taskId: ID!
+  $urlArg: ID!
   $payloadArg: ID!
 ) {
-  deployWorkflow(data: {
-    title: "Super workflow",
-    description: "bla bla bla",
-    source: {
-      create: {
-        event: { connect: { id: $sourceId } }, # Ethereum#onTransaction
-        filters: {
-          create: [
-            {
-              parameter: { connect: { id: $filter1 } }, # Transaction Hash
-              predicate: EQ,
-              value: "0x134324r2482549824598425"
-            }, {
-              parameter: { connect: { id: $filter2 } }, # Fees
-              predicate: GTEQ,
-              value: "45000"
-            }
-          ]
-        },
-        whitelist: {
-          connect: [
-            { publicKey: "publickey#1" }
-          ]
-        }
-      }
-    },
-    tasks: {
-      create: [
-        {
-          task: { connect: { id: $taskId } }, # Webhook#send
-       		parameters: {
+  deployWorkflow(
+    data: {
+      title: "Super workflow"
+      description: "bla bla bla"
+      source: {
+        create: {
+          event: { connect: { id: $sourceId } } # Ethereum#onTransaction
+          filters: {
             create: [
               {
-                reference: { connect: { id: $urlArg } } # url
-                value: "https://webhook.com"
-              }, {
-                reference: { connect: { id: $payloadArg } }, # payload
-                value: "{ foo: 'bar' }"
+                parameter: { connect: { id: $filter1 } } # Transaction Hash
+                predicate: EQ
+                value: "0x134324r2482549824598425"
+              }
+              {
+                parameter: { connect: { id: $filter2 } } # Fees
+                predicate: GTEQ
+                value: "45000"
               }
             ]
           }
+          whitelist: { connect: [{ publicKey: "publickey#1" }] }
         }
-      ]
+      }
+      tasks: {
+        create: [
+          {
+            task: { connect: { id: $taskId } } # Webhook#send
+            parameters: {
+              create: [
+                {
+                  reference: { connect: { id: $urlArg } } # url
+                  value: "https://webhook.com"
+                }
+                {
+                  reference: { connect: { id: $payloadArg } } # payload
+                  value: "{ foo: 'bar' }"
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
-  }) { id }
+  ) {
+    id
+  }
 }

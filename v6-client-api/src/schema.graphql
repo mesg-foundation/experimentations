@@ -2,13 +2,37 @@
 
 type Query {
   runner(where: RunnerWhereUniqueInput!): Runner
-  runners(where: RunnerWhereInput, orderBy: RunnerOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Runner]!
+  runners(
+    where: RunnerWhereInput
+    orderBy: RunnerOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [Runner]!
 
   workflow(where: WorkflowWhereUniqueInput!): Workflow
-  workflows(where: WorkflowWhereInput, orderBy: WorkflowOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Workflow]!
+  workflows(
+    where: WorkflowWhereInput
+    orderBy: WorkflowOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [Workflow]!
 
   service(where: ServiceWhereUniqueInput!): Service
-  services(where: ServiceWhereInput, orderBy: ServiceOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Service]!
+  services(
+    where: ServiceWhereInput
+    orderBy: ServiceOrderByInput
+    skip: Int
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): [Service]!
 }
 
 type Mutation {
