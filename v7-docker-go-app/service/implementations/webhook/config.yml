@@ -1,0 +1,31 @@
+name: webhook
+events:
+  request: &request
+    data:
+      - name: ip
+        type: String
+      - name: body
+        type: JSON
+  webhookSent: &webhookSent
+    data:
+      - name: body
+        type: JSON
+      - name: code
+        type: String
+commands:
+  webhook:
+    args:
+      - name: url
+        type: String
+      - name: headers
+        type: JSON
+      - name: data
+        type: JSON
+    events:
+      webhookSend: *webhookSent
+services:
+  app:
+    image: mesg/webhook
+    ports:
+      - 8080:8080
+  

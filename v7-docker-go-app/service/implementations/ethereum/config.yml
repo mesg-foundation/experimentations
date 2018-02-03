@@ -1,0 +1,36 @@
+name: ethereum
+description: "Hello ethereum"
+events:
+  onTransaction: &onTransaction
+    name: "onTransaction"
+    description: "Everytime a transaction is emitted"
+    data:
+      - name: hash
+        type: String
+      - name: from
+        type: String
+      - name: to
+        type: String
+      - name: value
+        type: Number
+commands:
+  transfer:
+    name: "Transfer"
+    args:
+      - name: to
+        type: String
+      - name: value
+        type: Number
+    events:
+      onTransaction: *onTransaction
+services:
+  app:
+    image: mesg/ethereum
+  # node:
+  #   image: parity/parity:stable
+  #   volumes:
+  #     - "~/.mesg/ethereum/node:/root/.local/share/io.parity.ethereum"
+  #   ports:
+  #     - 8546:8546
+  #     - 30303:30303
+  #   command: --light --no-ui --jsonrpc-interface 0.0.0.0 --jsonrpc-hosts=all --can-restart --no-secretstore --pruning fast --pruning-history 8 --db-compaction ssd --fat-db off --unsafe-expose

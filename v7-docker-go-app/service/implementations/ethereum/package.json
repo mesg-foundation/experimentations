@@ -1,0 +1,16 @@
+{
+  "name": "ethereum",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anthony Estebe <contact@anthonyestebe.com> (http://microblog.anthonyestebe.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "experimentation-mesg-js": "^1.0.0-beta2",
+    "web3": "^1.0.0-beta.26"
+  }
+}
