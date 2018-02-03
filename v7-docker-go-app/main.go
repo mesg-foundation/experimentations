@@ -9,12 +9,11 @@ import (
 	"context"
 	"fmt"
 
-	service "./service"
-	command "github.com/docker/cli/cli/command"
-	cliflags "github.com/docker/cli/cli/flags"
-	types "github.com/docker/docker/api/types"
-	term "github.com/docker/docker/pkg/term"
-	common "github.com/ethereum/go-ethereum/common"
+	"./service"
+	"github.com/docker/cli/cli/command"
+	"github.com/docker/cli/cli/flags"
+	"github.com/docker/docker/pkg/term"
+	"github.com/ethereum/go-ethereum/common"
 	ethClient "github.com/ethereum/go-ethereum/ethClient"
 )
 
@@ -32,15 +31,19 @@ func testEthereum() {
 }
 
 func testService() {
-	service := service.Start("webhook")
-	fmt.Println(service)
+	service, err := service.LoadFromConfig("webhook", nil)
+	if err != nil {
+		panic(err)
+	}
+	service.Start()
+	fmt.Println(service, err)
 }
 
 func testDocker() {
 	stdin, stdout, stderr := term.StdStreams()
 	cli := command.NewDockerCli(stdin, stdout, stderr)
-	cli.Initialize(&cliflags.ClientOptions{
-		Common: &cliflags.CommonOptions{
+	cli.Initialize(&flags.ClientOptions{
+		Common: &flags.CommonOptions{
 			Hosts: []string{"unix:///var/run/docker.sock"},
 		},
 	})
@@ -48,10 +51,10 @@ func testDocker() {
 	ctx := context.Background()
 	// containers, err := client.ContainerList(context.Background(), &types.ContainerListOptions{})
 	container, _ := client.ContainerInspect(ctx, "prisma-db")
-	options := types.ContainerListOptions{
-		All: true,
-	}
-	containers, err := client.ContainerList(ctx, options)
+	// options := types.ContainerListOptions{
+	// 	All: true,
+	// }
+	// containers, err := client.ContainerList(ctx, options)
 	fmt.Println(container)
 
 	// ctx := context.Background()
@@ -65,7 +68,7 @@ func testDocker() {
 }
 
 func main() {
-	// testService()
+	testService()
 	// testEthereum()
-	testDocker()
+	// testDocker()
 }
