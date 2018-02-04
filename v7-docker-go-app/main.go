@@ -35,5 +35,5 @@ func main() {
 	service.Start()
 	service.Stop()
 	// spew.Dump(service)
-	// testEthereum()
+	testEthereum()
 }
