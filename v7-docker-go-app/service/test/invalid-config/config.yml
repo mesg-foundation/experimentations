@@ -1,0 +1,15 @@
+naeme: ethereum
+descqfeription: "Hello ethereum"
+evqeents:
+  onTrafqensaction: &onTransaction
+    neame: "onTransaction"
+    desefqcription: "Everytime a transaction is emitted"
+    dafeqta:
+      - name: hash
+        type: String
+      - name: from
+        type: String
+      - name: to
+        type: String
+      - name: value
+        type: Number

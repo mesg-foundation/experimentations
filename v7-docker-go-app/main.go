@@ -10,9 +10,6 @@ import (
 	"fmt"
 
 	"./service"
-	"github.com/docker/cli/cli/command"
-	"github.com/docker/cli/cli/flags"
-	"github.com/docker/docker/pkg/term"
 	"github.com/ethereum/go-ethereum/common"
 	ethClient "github.com/ethereum/go-ethereum/ethClient"
 )
@@ -30,45 +27,13 @@ func testEthereum() {
 	fmt.Println(tx, pending)
 }
 
-func testService() {
-	service, err := service.LoadFromConfig("webhook", nil)
+func main() {
+	service, err := service.LoadFromConfig("ethereum", nil)
 	if err != nil {
 		panic(err)
 	}
 	service.Start()
-	fmt.Println(service, err)
-}
-
-func testDocker() {
-	stdin, stdout, stderr := term.StdStreams()
-	cli := command.NewDockerCli(stdin, stdout, stderr)
-	cli.Initialize(&flags.ClientOptions{
-		Common: &flags.CommonOptions{
-			Hosts: []string{"unix:///var/run/docker.sock"},
-		},
-	})
-	client := cli.Client()
-	ctx := context.Background()
-	// containers, err := client.ContainerList(context.Background(), &types.ContainerListOptions{})
-	container, _ := client.ContainerInspect(ctx, "prisma-db")
-	// options := types.ContainerListOptions{
-	// 	All: true,
-	// }
-	// containers, err := client.ContainerList(ctx, options)
-	fmt.Println(container)
-
-	// ctx := context.Background()
-	// // options := types.ContainerListOptions{
-	// // 	All: true,
-	// // }
-	// cs, err := client.ContainerInspect(ctx, "6a64838cd60c")
-	// fmt.Println("passe", cs, err)
-	// // cs, error := client.ContainerList(ctx, options)
-	// // fmt.Println(cs)
-}
-
-func main() {
-	testService()
+	service.Stop()
+	// spew.Dump(service)
 	// testEthereum()
-	// testDocker()
 }
