@@ -20,9 +20,3 @@ func TestWrongConfigFile(t *testing.T) {
 	_, err := service.ConfigFile("ethereum", nil)
 	assert.NotNil(t, err)
 }
-
-func TestCreateDockerCli(t *testing.T) {
-	cli, err := service.CreateDockerCli()
-	assert.Nil(t, err)
-	assert.NotNil(t, cli)
-}

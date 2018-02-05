@@ -2,28 +2,26 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 	"strings"
 
-	"github.com/docker/cli/cli/command"
-	"github.com/docker/cli/cli/command/stack/options"
-	"github.com/docker/cli/cli/command/stack/swarm"
+	"github.com/docker/docker/api/types/swarm"
+	docker "github.com/fsouza/go-dockerclient"
 	yaml "gopkg.in/yaml.v2"
 )
 
-var dockerCli command.Cli
+var dockerCli *docker.Client
+
+const (
+	labelImage     = "com.docker.stack.image"
+	labelNamespace = "com.docker.stack.namespace"
+)
 
 // Config is the struct related to where to find the service configurations
 type Config struct {
 	Directory string
 	File      string
-}
-
-// Service is a definition for a service to run
-type Service struct {
-	Name        string   `yaml:"name"`
-	Description string   `yaml:"description"`
-	Commands    Commands `yaml:"commands"`
-	Events      Events   `yaml:"events"`
 }
 
 // LoadFromConfig returns a service object based on the serviceName
@@ -49,52 +47,87 @@ func (service *Service) namespace() string {
 }
 
 // Start a service
-func (service *Service) Start() (*Service, error) {
-
-	// file, err := ioutil.TempFile(os.TempDir(), service.Name)
-	err := swarm.RunDeploy(dockerCli, options.Deploy{
-		Namespace:    service.namespace(),
-		Prune:        true,
-		ResolveImage: "changed",
-		Composefile:  "./service/implementations/ethereum/docker-compose.yml",
-	})
-
-	// defer os.Remove(file.Name())
-
-	return service, err
+func (service *Service) Start() error {
+	var err error
+	fmt.Println("[Start] " + service.Name)
+	for app, s := range service.Applications {
+		fmt.Println("\t- " + app)
+		ports := make([]swarm.PortConfig, len(s.Ports))
+		for i, p := range s.Ports {
+			split := strings.Split(p, ":")
+			from, _ := strconv.Atoi(split[0])
+			to, _ := strconv.Atoi(split[1])
+			ports[i] = swarm.PortConfig{
+				Protocol:      swarm.PortConfigProtocolTCP,
+				PublishMode:   "ingress",
+				TargetPort:    uint32(to),
+				PublishedPort: uint32(from),
+			}
+		}
+		s.SwarmService, err = dockerCli.CreateService(docker.CreateServiceOptions{
+			ServiceSpec: swarm.ServiceSpec{
+				Annotations: swarm.Annotations{
+					Name: strings.Join([]string{service.namespace(), app}, "_"),
+					Labels: map[string]string{
+						labelImage:     s.Image,
+						labelNamespace: service.namespace(),
+					},
+				},
+				TaskTemplate: swarm.TaskSpec{
+					ContainerSpec: &swarm.ContainerSpec{
+						Image: s.Image,
+						Args:  strings.Fields(s.Command),
+						Labels: map[string]string{
+							labelNamespace: service.namespace(),
+						},
+					},
+				},
+				EndpointSpec: &swarm.EndpointSpec{
+					Ports: ports,
+				},
+			},
+		})
+	}
+	// Disgrasfully close the service because there is an error
+	if err != nil {
+		service.Stop()
+	}
+	return err
 }
 
 // Stop a service
-func (service *Service) Stop() (*Service, error) {
-	err := swarm.RunRemove(dockerCli, options.Remove{
-		Namespaces: []string{
-			service.namespace(),
-		},
-	})
-	return service, err
+func (service *Service) Stop() error {
+	var err error
+	fmt.Println("[Stop] " + service.Name)
+	for app, s := range service.Applications {
+		if s.SwarmService != nil {
+			fmt.Println("\t- " + app)
+			err = dockerCli.RemoveService(docker.RemoveServiceOptions{
+				ID: s.SwarmService.ID,
+			})
+		}
+	}
+	return err
 }
 
 // Restart a service
-func (service *Service) Restart() (*Service, error) {
+func (service *Service) Restart() error {
 	service.Stop()
 	return service.Start()
 }
 
+// IsValid returns if the service is valid
+func (service *Service) IsValid() bool {
+	return service.Name != "" &&
+		len(service.Commands)+len(service.Events) > 0 &&
+		len(service.Applications) > 0
+}
+
 func init() {
-	cli, err := CreateDockerCli()
-	dockerCli = cli
+	endpoint := "unix:///var/run/docker.sock"
+	client, err := docker.NewClient(endpoint)
 	if err != nil {
 		panic(err)
 	}
-}
-
-// IsValid returns if the service is valid
-func (service *Service) IsValid() bool {
-	if service.Name == "" {
-		return false
-	}
-	if len(service.Commands)+len(service.Events) == 0 {
-		return false
-	}
-	return true
+	dockerCli = client
 }
