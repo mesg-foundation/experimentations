@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 
+	"./backend"
 	"./service"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
@@ -17,11 +19,11 @@ func main() {
 		return
 	}
 
-	err = service.Stop()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	// spew.Dump(service)
-	// backend.TestEthereum()
+	// err = service.Stop()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	spew.Dump(service)
+	backend.TestEthereum()
 }
